@@ -1,6 +1,6 @@
 # Workflow simulations
 
-These examples describe behavior to pressure-test before choosing an architecture. They do not select a database, schema, ontology, API, or permanent name for the internal layer.
+These examples describe behavior to pressure-test before choosing an architecture. Every step and expected result is a starting hypothesis that the traces may correct. They do not select a database, schema, ontology, API, or permanent name for the internal layer.
 
 References such as `T055` point to the stable entries in the [verbatim origin conversation](../source/origin-conversation-verbatim.md).
 
@@ -18,7 +18,7 @@ The diagrams are interaction flows, not a proposed component diagram. The transc
 
 - A work agent reports authenticated output showing `zfs_arc_max=2147483648` on N5.
 - It states that this is observed configuration, not an accepted permanent sizing decision.
-- The submission includes the evidence, its source, observation time, and a retry identity.
+- The submission includes the evidence, its source, and observation time.
 
 **Steps**
 
@@ -26,8 +26,8 @@ The diagrams are interaction flows, not a proposed component diagram. The transc
 2. The translation layer resolves N5, ARC, the observed value, and the distinction between live configuration and policy.
 3. It inspects related current knowledge and any earlier statement that treated 2 GiB as settled.
 4. It proposes a bounded change that preserves the source, records the observation, and keeps the policy qualification attached.
-5. The knowledge store validates and applies the change as one accepted result.
-6. The translation layer returns a receipt explaining what was recorded and what was not promoted to a decision.
+5. The knowledge store evaluates the proposed change and either records it or explains why it cannot.
+6. The translation layer returns a result explaining what was recorded and what was not promoted to a decision.
 
 **Expected result**
 
@@ -42,16 +42,16 @@ sequenceDiagram
     participant W as Work agent
     participant T as Translation layer
     participant K as Knowledge store
-    W->>T: Submit observation, qualification, evidence, and retry identity
+    W->>T: Submit observation, qualification, and evidence
     T->>K: Resolve subjects and inspect related knowledge
     K-->>T: Current observations, decisions, and source references
     T->>K: Propose source preservation and interpreted change
     alt Change validates
-        K-->>T: Commit result and receipt data
+        K-->>T: Recorded result details
         T-->>W: Recorded observation with policy caveat
     else Identity or evidence is insufficient
         K-->>T: Validation failure
-        T-->>W: No accepted change; explain ambiguity
+        T-->>W: No accepted change, explain ambiguity
     end
 ```
 
@@ -110,9 +110,9 @@ Transcript basis: `T046–T052`, `T055–T060`.
 1. The translation layer resolves the correction target and retrieves its history and sources.
 2. It distinguishes a correction, a qualification, and a newly observed change.
 3. It preserves the earlier statement and proposes the smallest relationship between old and new meanings: replacement, qualification, or coexistence.
-4. The knowledge store checks that the target has not changed underneath the request.
+4. Before applying the correction, the knowledge store exposes whether the target still matches what the layer interpreted.
 5. On success, it records the new interpretation and its relationship to the old one without erasing history.
-6. The translation layer returns the new current reading and a receipt describing the history change.
+6. The translation layer returns the new current reading and an explanation of the history change.
 
 **Expected result**
 
@@ -129,11 +129,11 @@ sequenceDiagram
     participant K as Knowledge store
     W->>T: Submit correction and supporting context
     T->>K: Resolve target and inspect history
-    K-->>T: Candidate target, revisions, and sources
+    K-->>T: Candidate target, current state, and sources
     T->>K: Propose correction, qualification, or supersession
     alt Target is unambiguous and current
-        K-->>T: Commit history-preserving change
-        T-->>W: Return corrected reading and receipt
+        K-->>T: Record history-preserving result
+        T-->>W: Return corrected reading and explanation
     else Target is ambiguous or changed
         K-->>T: Reject proposed change
         T-->>W: Return conflict without overwrite
@@ -174,8 +174,8 @@ sequenceDiagram
     K-->>T: Sources, times, scopes, and current interpretation
     alt Evidence resolves the conflict
         T->>K: Propose sourced correction or supersession
-        K-->>T: Commit resolved history
-        T-->>W: Return resolution and receipt
+        K-->>T: Record resolved history
+        T-->>W: Return resolution and supporting detail
     else Evidence remains ambiguous
         T->>K: Record competing interpretation and unresolved conflict
         K-->>T: Preserve both without forced winner
@@ -190,15 +190,16 @@ Transcript basis: `T022–T024`, `T046–T052`, `T055–T061`.
 **Input**
 
 - A work agent retries the same N5 observation because its first response timed out.
-- The evidence and retry identity are unchanged.
+- The available evidence suggests this is a repeat of the earlier attempt; the simulations still need to discover how sameness can be established.
 
 **Steps**
 
-1. The translation layer receives the retry as a clean invocation.
-2. It asks the knowledge store whether that retry identity and content were already processed.
-3. If they match an accepted transaction, it returns the earlier receipt without creating another source, fact, or link.
-4. If the first attempt never committed, it evaluates the submission normally.
-5. If the retry identity matches but the content differs, it returns a mismatch instead of guessing which request is authoritative.
+1. The translation layer receives the repeat as a clean invocation.
+2. It inspects whatever durable evidence exists about the earlier attempt, its content, and its effects.
+3. If the earlier effect is established, it returns that outcome without creating another source, fact, or link.
+4. If the earlier outcome is unknown, it reports that uncertainty or reconciles it before applying anything new.
+5. It treats the submission as new only when the available evidence establishes that the earlier attempt had no effect.
+6. If the layer cannot establish that the content is the same, it exposes the ambiguity instead of guessing.
 
 **Expected result**
 
@@ -206,25 +207,28 @@ Transcript basis: `T022–T024`, `T046–T052`, `T055–T061`.
 
 **Key failure variant**
 
-- Reusing an identity for different evidence produces a visible conflict; neither version silently replaces the other.
+- The trace exposes which evidence, identity, or stored outcome made the repeat recognizable. If none is sufficient, that limitation remains visible rather than being filled in with an invented mechanism.
 
 ```mermaid
 sequenceDiagram
     participant W as Work agent
     participant T as Translation layer
     participant K as Knowledge store
-    W->>T: Retry submission with the same identity
-    T->>K: Check prior processing and content identity
-    alt Same submission already committed
-        K-->>T: Existing receipt
-        T-->>W: Return prior result as a no-op
-    else No committed result exists
+    W->>T: Repeat submission after a lost response
+    T->>K: Inspect evidence of the earlier attempt and effects
+    alt Earlier effect is established
+        K-->>T: Prior outcome
+        T-->>W: Return prior result without another change
+    else Earlier outcome is indeterminate
+        K-->>T: Outcome cannot yet be established
+        T-->>W: Return indeterminate or request reconciliation
+    else Earlier attempt is established to have no effect
         T->>K: Validate and apply submission
-        K-->>T: New commit receipt
+        K-->>T: New result
         T-->>W: Return new result
-    else Identity matches but content differs
-        K-->>T: Identity conflict
-        T-->>W: Reject ambiguous retry
+    else Sameness cannot be established
+        K-->>T: Ambiguous prior attempt
+        T-->>W: Explain ambiguity
     end
 ```
 
@@ -263,7 +267,7 @@ sequenceDiagram
     K-->>T: Canonical piece and relationship neighborhood
     T->>K: Propose supported missing relationships
     alt Endpoints and meaning validate
-        K-->>T: Commit relationship changes
+        K-->>T: Record relationship changes
         T-->>W: Return one piece with multiple paths
     else Relationship is uncertain or invalid
         K-->>T: Keep provisional or reject
@@ -273,7 +277,7 @@ sequenceDiagram
 
 Transcript basis: `T043–T048`, `T051–T052`, `T055–T061`.
 
-## 7. Reject or recover from an invalid partial mutation
+## 7. Explore an invalid or partial mutation
 
 **Input**
 
@@ -283,18 +287,18 @@ Transcript basis: `T043–T048`, `T051–T052`, `T055–T061`.
 **Steps**
 
 1. The translation layer interprets the whole request and inspects every affected item.
-2. It prepares a bounded set of related changes rather than applying each semantic step immediately.
-3. The knowledge store validates the complete set and detects the invalid target.
-4. No partial accepted state remains: either the full interpreted change is rejected or a separately defined source-capture step remains clearly distinct from accepted knowledge.
-5. The response identifies the failed part, the unchanged accepted state, and whether the original evidence was retained for another attempt.
+2. It describes the intended combined result and the changes that might occur along the way.
+3. The knowledge store exposes that the operation target cannot be resolved.
+4. The trace records which, if any, changes became visible and whether the original evidence was retained.
+5. The response identifies the failed part and the observed state instead of implying that the whole request succeeded or failed uniformly.
 
 **Expected result**
 
-- A failed multi-step interpretation cannot leave a new observation accepted while its correction or required relationship is missing without saying so explicitly.
+- A failed multi-step interpretation leaves an explicit, inspectable account of what changed, what did not, and what remains unknown. The traces decide whether all-or-nothing behavior is required.
 
 **Key failure variant**
 
-- A process failure after validation yields a failed or indeterminate receipt that can be inspected and retried; it never reports success without a durable commit result.
+- If the process stops after changes may have begun, the result remains indeterminate until inspection establishes the current state.
 
 ```mermaid
 sequenceDiagram
@@ -304,13 +308,18 @@ sequenceDiagram
     W->>T: Submit one intent requiring several related changes
     T->>K: Inspect all affected knowledge
     K-->>T: Current state and unresolved target
-    T->>K: Propose bounded multi-part change
-    alt Entire change validates and commits
-        K-->>T: Commit receipt
+    T->>K: Propose one intent with several related effects
+    alt All intended effects are observed
+        K-->>T: Accepted result
         T-->>W: Return accepted result
-    else Any required part is invalid
-        K-->>T: Reject or roll back accepted-state changes
-        T-->>W: Return failure, unchanged state, and evidence status
+    else Invalid target is found before a change
+        K-->>T: No accepted effect and evidence status
+        T-->>W: Return failed part and observed state
+    else Process stops after effects may have begun
+        K-->>T: Outcome unknown
+        T->>K: Inspect current effects
+        K-->>T: Observed state and remaining uncertainty
+        T-->>W: Return indeterminate result and reconciliation need
     end
 ```
 
@@ -351,7 +360,7 @@ sequenceDiagram
     alt Evidence establishes the preconditions
         T-->>W: Supported answer with evidence and remaining risks
     else A critical precondition is unproven
-        T-->>W: Not established; identify blocker and source gap
+        T-->>W: Not established, identify blocker and source gap
     end
 ```
 
@@ -359,7 +368,7 @@ Transcript basis: `T013–T024`, `T043–T052`, `T055–T061`.
 
 ## Questions these workflows leave open
 
-- Does raw evidence commit independently when its interpreted mutation fails?
+- Is raw evidence retained independently when its interpretation fails?
 - What distinguishes an accepted relationship from a useful inferred one?
 - Which submissions need explicit human acceptance, and which can record direct observations immediately?
 - What makes two retries the same: caller identity, supplied identity, evidence content, or some combination?

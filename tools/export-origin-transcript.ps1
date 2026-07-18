@@ -13,6 +13,7 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+$repositoryRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 
 function Resolve-OutputPath {
     param([Parameter(Mandatory)][string]$Path)
@@ -21,7 +22,17 @@ function Resolve-OutputPath {
         return [IO.Path]::GetFullPath($Path)
     }
 
-    return [IO.Path]::GetFullPath((Join-Path (Get-Location) $Path))
+    return [IO.Path]::GetFullPath((Join-Path $repositoryRoot $Path))
+}
+
+function ConvertFrom-SessionTimestamp {
+    param([Parameter(Mandatory)][string]$Value)
+
+    return [DateTimeOffset]::Parse(
+        $Value,
+        [Globalization.CultureInfo]::InvariantCulture,
+        [Globalization.DateTimeStyles]::AssumeUniversal
+    )
 }
 
 function Get-TextSha256 {
@@ -41,15 +52,11 @@ $resolvedSessionPath = (Resolve-Path -LiteralPath $SessionPath).Path
 $resolvedOutputPath = Resolve-OutputPath -Path $OutputPath
 $resolvedProvenancePath = Resolve-OutputPath -Path $ProvenancePath
 $resolvedChecksumPath = Resolve-OutputPath -Path $ChecksumPath
-$repositoryRoot = [IO.Path]::GetFullPath((Get-Location).Path)
-$cutoff = [DateTimeOffset]::Parse(
-    $CutoffTimestamp,
-    [Globalization.CultureInfo]::InvariantCulture,
-    [Globalization.DateTimeStyles]::AssumeUniversal
-)
+$cutoff = ConvertFrom-SessionTimestamp -Value $CutoffTimestamp
 
 $entries = [Collections.Generic.List[object]]::new()
-$currentTurnEntryIndexes = [Collections.Generic.List[int]]::new()
+$turnEntryIndexes = [Collections.Generic.List[object]]::new()
+$currentTurnEntryIndexes = $null
 $requestInputCalls = @{}
 $abortedTurns = [Collections.Generic.List[object]]::new()
 $rollbackEvents = [Collections.Generic.List[object]]::new()
@@ -62,7 +69,7 @@ foreach ($line in Get-Content -LiteralPath $resolvedSessionPath) {
     $timestampText = $null
     if ($line -match '"timestamp":"([^"]+)"') {
         $timestampText = $Matches[1]
-        if ([DateTimeOffset]::Parse($timestampText) -gt $cutoff) {
+        if ((ConvertFrom-SessionTimestamp -Value $timestampText) -gt $cutoff) {
             break
         }
     }
@@ -75,7 +82,8 @@ foreach ($line in Get-Content -LiteralPath $resolvedSessionPath) {
     }
 
     if ($record.type -eq "event_msg" -and $record.payload.type -eq "task_started") {
-        $currentTurnEntryIndexes.Clear()
+        $currentTurnEntryIndexes = [Collections.Generic.List[int]]::new()
+        $turnEntryIndexes.Add($currentTurnEntryIndexes)
         continue
     }
 
@@ -90,13 +98,32 @@ foreach ($line in Get-Content -LiteralPath $resolvedSessionPath) {
     }
 
     if ($record.type -eq "event_msg" -and $record.payload.type -eq "thread_rolled_back") {
-        foreach ($index in $currentTurnEntryIndexes) {
-            $entries[$index].RolledBack = $true
+        $numTurns = [int]$record.payload.num_turns
+        if ($numTurns -lt 1 -or $numTurns -gt $turnEntryIndexes.Count) {
+            throw "Invalid rollback of $numTurns turn(s) at source line $lineNumber; $($turnEntryIndexes.Count) tracked turn(s) are available."
+        }
+
+        $firstRolledBackTurn = $turnEntryIndexes.Count - $numTurns
+        for ($turnIndex = $firstRolledBackTurn; $turnIndex -lt $turnEntryIndexes.Count; $turnIndex++) {
+            foreach ($index in $turnEntryIndexes[$turnIndex]) {
+                $entries[$index].RolledBack = $true
+            }
+        }
+
+        for ($removed = 0; $removed -lt $numTurns; $removed++) {
+            $turnEntryIndexes.RemoveAt($turnEntryIndexes.Count - 1)
+        }
+
+        if ($turnEntryIndexes.Count -gt 0) {
+            $currentTurnEntryIndexes = $turnEntryIndexes[$turnEntryIndexes.Count - 1]
+        }
+        else {
+            $currentTurnEntryIndexes = $null
         }
         $rollbackEvents.Add([pscustomobject]@{
             Line      = $lineNumber
             Timestamp = $timestampText
-            NumTurns  = [int]$record.payload.num_turns
+            NumTurns  = $numTurns
         })
         continue
     }
@@ -127,6 +154,9 @@ foreach ($line in Get-Content -LiteralPath $resolvedSessionPath) {
             RolledBack = $false
         }
         $entries.Add($entry)
+        if ($null -eq $currentTurnEntryIndexes) {
+            throw "Message at source line $lineNumber is not inside a tracked turn."
+        }
         $currentTurnEntryIndexes.Add($entries.Count - 1)
         continue
     }
@@ -142,6 +172,9 @@ foreach ($line in Get-Content -LiteralPath $resolvedSessionPath) {
             RolledBack = $false
         }
         $entries.Add($entry)
+        if ($null -eq $currentTurnEntryIndexes) {
+            throw "Interactive prompt at source line $lineNumber is not inside a tracked turn."
+        }
         $currentTurnEntryIndexes.Add($entries.Count - 1)
         $requestInputCalls[[string]$record.payload.call_id] = $true
         continue
@@ -161,6 +194,9 @@ foreach ($line in Get-Content -LiteralPath $resolvedSessionPath) {
             RolledBack = $false
         }
         $entries.Add($entry)
+        if ($null -eq $currentTurnEntryIndexes) {
+            throw "Interactive response at source line $lineNumber is not inside a tracked turn."
+        }
         $currentTurnEntryIndexes.Add($entries.Count - 1)
     }
 }
@@ -175,42 +211,41 @@ $messageEntries = @($entries | Where-Object { $_.Kind -eq "message" })
 $interactiveEntries = @($entries | Where-Object { $_.Kind -ne "message" })
 
 $transcript = [Text.StringBuilder]::new()
-[void]$transcript.AppendLine("# Origin conversation - verbatim")
-[void]$transcript.AppendLine()
-[void]$transcript.AppendLine("This is the complete canonical human/assistant conversation captured from the original Codex session through the recorded cutoff. Message bodies are unchanged. Headings and timestamps are the only additions.")
-[void]$transcript.AppendLine()
-[void]$transcript.AppendLine("- Session: ``$sessionId``")
-[void]$transcript.AppendLine("- Cutoff: ``$CutoffTimestamp``")
-[void]$transcript.AppendLine("- Canonical entries: $($canonicalEntries.Count)")
-[void]$transcript.AppendLine("- Extraction details: [provenance.md](provenance.md)")
-[void]$transcript.AppendLine()
+[void]$transcript.Append("# Origin conversation - verbatim`n`n")
+[void]$transcript.Append("This is the complete canonical human/assistant conversation captured from the original Codex session through the recorded cutoff. Message bodies are unchanged. Headings and timestamps are the only additions.`n`n")
+[void]$transcript.Append("- Session: ``$sessionId```n")
+[void]$transcript.Append("- Cutoff: ``$CutoffTimestamp```n")
+[void]$transcript.Append("- Canonical entries: $($canonicalEntries.Count)`n")
+[void]$transcript.Append("- Extraction details: [provenance.md](provenance.md)`n`n")
 
 $sequence = 0
 foreach ($entry in $canonicalEntries) {
     $sequence++
     $anchor = "T{0:D3}" -f $sequence
     $kindSuffix = if ($entry.Kind -eq "message") { "" } else { " - $($entry.Kind)" }
-    [void]$transcript.AppendLine("## $anchor - $($entry.Role)$kindSuffix")
-    [void]$transcript.AppendLine()
-    [void]$transcript.AppendLine("``$($entry.Timestamp)``")
-    [void]$transcript.AppendLine()
+    [void]$transcript.Append("## $anchor - $($entry.Role)$kindSuffix`n`n")
+    [void]$transcript.Append("``$($entry.Timestamp)```n`n")
 
     if ($entry.Kind -eq "message") {
         [void]$transcript.Append($entry.Text)
         if (-not $entry.Text.EndsWith("`n")) {
-            [void]$transcript.AppendLine()
+            [void]$transcript.Append("`n")
         }
     }
     else {
-        [void]$transcript.AppendLine('~~~json')
-        [void]$transcript.AppendLine($entry.Text)
-        [void]$transcript.AppendLine('~~~')
+        [void]$transcript.Append("~~~json`n")
+        [void]$transcript.Append($entry.Text)
+        if (-not $entry.Text.EndsWith("`n")) {
+            [void]$transcript.Append("`n")
+        }
+        [void]$transcript.Append("~~~`n")
     }
-    [void]$transcript.AppendLine()
+    [void]$transcript.Append("`n")
 }
 
 $utf8NoBom = [Text.UTF8Encoding]::new($false)
-[IO.File]::WriteAllText($resolvedOutputPath, $transcript.ToString(), $utf8NoBom)
+$transcriptText = $transcript.ToString()
+[IO.File]::WriteAllText($resolvedOutputPath, $transcriptText, $utf8NoBom)
 
 $provenance = [Text.StringBuilder]::new()
 [void]$provenance.AppendLine("# Transcript provenance")
@@ -221,7 +256,7 @@ $provenance = [Text.StringBuilder]::new()
 [void]$provenance.AppendLine("- Source file: ``$([IO.Path]::GetFileName($resolvedSessionPath))``")
 [void]$provenance.AppendLine("- Cutoff timestamp: ``$CutoffTimestamp``")
 [void]$provenance.AppendLine("- Raw user/assistant message records through cutoff: $($messageEntries.Count)")
-[void]$provenance.AppendLine("- Rolled-back message records excluded from the canonical conversation: $($rolledBackEntries.Count)")
+[void]$provenance.AppendLine("- Rolled-back conversation entries excluded from the canonical conversation: $($rolledBackEntries.Count)")
 [void]$provenance.AppendLine("- Interactive prompt/response records included: $($interactiveEntries.Count)")
 [void]$provenance.AppendLine("- Canonical transcript entries: $($canonicalEntries.Count)")
 [void]$provenance.AppendLine()
@@ -230,6 +265,8 @@ $provenance = [Text.StringBuilder]::new()
 [void]$provenance.AppendLine("- Include every ``response_item`` message whose role is ``user`` or ``assistant``.")
 [void]$provenance.AppendLine("- Include ``request_user_input`` prompts and their matching user responses because they contain visible conversation decisions.")
 [void]$provenance.AppendLine("- Preserve message text exactly as stored. Add only transcript headings and timestamps.")
+[void]$provenance.AppendLine("- When one message record contains several text parts, concatenate those parts in source order with one LF; the transcript does not otherwise mark the part boundary.")
+[void]$provenance.AppendLine("- Generate transcript framing with LF while preserving any line-ending characters inside source message bodies; the transcript is marked non-normalizing in ``.gitattributes``.")
 [void]$provenance.AppendLine("- Exclude entries belonging to a turn that the session records as rolled back.")
 [void]$provenance.AppendLine()
 [void]$provenance.AppendLine("## Exclusions")
@@ -285,7 +322,8 @@ else {
 [void]$provenance.AppendLine("  -CutoffTimestamp '$CutoffTimestamp'")
 [void]$provenance.AppendLine('~~~')
 
-[IO.File]::WriteAllText($resolvedProvenancePath, $provenance.ToString(), $utf8NoBom)
+$provenanceText = $provenance.ToString().Replace("`r`n", "`n")
+[IO.File]::WriteAllText($resolvedProvenancePath, $provenanceText, $utf8NoBom)
 
 $outputRelative = [IO.Path]::GetRelativePath($repositoryRoot, $resolvedOutputPath).Replace("\", "/")
 $provenanceRelative = [IO.Path]::GetRelativePath($repositoryRoot, $resolvedProvenancePath).Replace("\", "/")

@@ -6,7 +6,7 @@
 - Source file: `rollout-2026-07-18T03-52-20-019f746d-2d62-7c90-9326-fd89d3be29f7.jsonl`
 - Cutoff timestamp: `2026-07-18T10:12:40.761Z`
 - Raw user/assistant message records through cutoff: 74
-- Rolled-back message records excluded from the canonical conversation: 2
+- Rolled-back conversation entries excluded from the canonical conversation: 2
 - Interactive prompt/response records included: 2
 - Canonical transcript entries: 74
 
@@ -15,6 +15,8 @@
 - Include every `response_item` message whose role is `user` or `assistant`.
 - Include `request_user_input` prompts and their matching user responses because they contain visible conversation decisions.
 - Preserve message text exactly as stored. Add only transcript headings and timestamps.
+- When one message record contains several text parts, concatenate those parts in source order with one LF; the transcript does not otherwise mark the part boundary.
+- Generate transcript framing with LF while preserving any line-ending characters inside source message bodies; the transcript is marked non-normalizing in `.gitattributes`.
 - Exclude entries belonging to a turn that the session records as rolled back.
 
 ## Exclusions

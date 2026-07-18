@@ -2,7 +2,7 @@
 
 ## Short answer
 
-This spike is not copied from one established “knowledge agent” pattern. It deliberately composes a few small, useful ideas from requirements discovery, traceability, behavioral modeling, testing, and safety analysis. That is appropriate because the uncertain layer here does more than retrieve: it interprets incoming intent and evidence, encodes and organizes knowledge, preserves provenance and corrections, and returns bounded context. The transcript explicitly warns against collapsing that work into the familiar retrieval-agent category and asks for corpus preservation, requirements distillation, workflows, simulations, state discovery, and only then design. ([T061](../source/origin-conversation-verbatim.md#t061---user), [T063](../source/origin-conversation-verbatim.md#t063---user))
+This spike is not copied from one established “knowledge agent” pattern. It deliberately composes a few small, useful ideas from requirements discovery, traceability, behavioral modeling, testing, and safety analysis. That is appropriate because the uncertain layer here does more than retrieve: it interprets incoming intent and evidence, encodes and organizes knowledge, preserves provenance and corrections, and returns bounded context. The transcript explicitly warns against collapsing that work into the familiar retrieval-agent category and asks for corpus preservation, requirements distillation, workflows, simulations, state discovery, and only then design. ([T061](../source/origin-conversation-verbatim.md#t061---user), [T062](../source/origin-conversation-verbatim.md#t062---assistant), [T063](../source/origin-conversation-verbatim.md#t063---user), [T064](../source/origin-conversation-verbatim.md#t064---assistant))
 
 No source below is adopted wholesale. Each contributes one technique to the [simulation plan](simulation-plan.md).
 
@@ -32,25 +32,9 @@ Adjacent systems establish important pieces, but their documented boundaries do 
 
 The inference from those official boundaries is narrow: there is no single settled, product-neutral pattern among them for a small, stateless LLM-mediated layer that accepts free-form intent and evidence and is responsible for interpretation, encoding, organization, correction, retrieval, and traceable results. That absence is why this repository starts with behavioral traces instead of selecting a product category.
 
-## Local prior evidence, not inheritance
+## Private prototypes are question sources, not inheritance
 
-Two earlier repositories show useful experiments and failure modes. They are evidence to interrogate, not an architecture to copy.
-
-### PersonalKnowledgeBase
-
-[PersonalKnowledgeBase](https://github.com/Coldaine/PersonalKnowledgeBase) selected Graphiti and its MCP server as an early personal temporal-knowledge approach. It demonstrates the appeal of incremental ingestion, temporal relationships, and standard agent tooling. It also demonstrates why a product choice cannot substitute for the missing behavioral contract: selecting Graphiti does not answer how free-form submissions are interpreted, how a correction differs from conflict, which writes are accepted, or what the caller receives.
-
-Nothing in this spike inherits its database, entity model, grouping scheme, or MCP surface.
-
-### LocalLargeLanguageModels
-
-[LocalLargeLanguageModels](https://github.com/Coldaine/LocalLargeLanguageModels) contains useful prototype evidence:
-
-- Its [query pressure test](https://github.com/Coldaine/LocalLargeLanguageModels/blob/main/docs/architecture/information-graph/examples/old-task-pressure-test.md) is evidence for testing a model against concrete tasks before treating it as useful.
-- Its [graph-fact importer](https://github.com/Coldaine/LocalLargeLanguageModels/blob/main/tools/information_store/import_graph_facts.py) is evidence that accepting already-shaped nodes and edges pushes semantic interpretation outside the knowledge boundary—the opposite of the concern raised here.
-- Its [schema validator](https://github.com/Coldaine/LocalLargeLanguageModels/blob/main/scripts/validate_schema_v1.py) is evidence that declared structure and enforced write behavior are separate problems.
-
-The prior repository is model-specific and backend-specific. This spike does not inherit its ontology, YAML fields, FalkorDB choice, importer contract, or lifecycle assumptions.
+Earlier private experiments were inspected for useful failure questions: whether shaped graph imports push interpretation outside the desired boundary, whether a model survives concrete task pressure, and whether declared structure matches observed query behavior. They are intentionally not linked or used as required evidence in this public repository. This spike inherits no database, entity model, schema, importer contract, or lifecycle assumption from them.
 
 ## Resulting method for this repository
 
