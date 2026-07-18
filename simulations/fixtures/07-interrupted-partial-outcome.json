@@ -1,0 +1,66 @@
+{
+  "id": "07-interrupted-partial-outcome",
+  "title": "Inspect and report an interrupted change with one observed effect",
+  "basis": ["T055-T061", "interaction-trace-7-pressure"],
+  "feasibility": "protocol-dependent",
+  "items": {
+    "request.inspect-interrupted": "The caller asks what happened after an interrupted multi-effect change",
+    "request.operation-id": "The interrupted operation identity",
+    "lookup.operation-effects": "A request for the journal and every affected reference",
+    "store.journal.interrupted": "The durable operation journal records an interruption",
+    "store.effect.observation-applied": "Inspection establishes that the observation effect applied",
+    "status.correction-indeterminate": "The correction effect cannot yet be established",
+    "status.link-not-applied": "Inspection establishes that the link did not apply",
+    "coverage.effects-inspected": "Every named effect was inspected even though one remains unknown",
+    "response.partial-and-indeterminate": "The caller receives each applied, absent, and unknown effect separately",
+    "durable.replayed-observation": "A duplicate observation created during inspection"
+  },
+  "initial": {
+    "outside": ["request.inspect-interrupted", "request.operation-id"],
+    "layer": [],
+    "store": [],
+    "durable": ["store.journal.interrupted", "store.effect.observation-applied", "status.correction-indeterminate", "status.link-not-applied"]
+  },
+  "steps": [
+    {
+      "id": "submit-inspection",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send the interrupted operation identity and ask for its effects",
+      "requires": ["request.inspect-interrupted", "request.operation-id"],
+      "send": [{"to": "layer", "items": ["request.inspect-interrupted", "request.operation-id"]}]
+    },
+    {
+      "id": "request-effects",
+      "actor": "layer",
+      "mode": "inspection",
+      "note": "Ask for the durable journal and each named effect",
+      "requires": ["request.inspect-interrupted", "request.operation-id"],
+      "derive": ["lookup.operation-effects"],
+      "send": [{"to": "store", "items": ["lookup.operation-effects", "request.operation-id"]}]
+    },
+    {
+      "id": "return-effects",
+      "actor": "store",
+      "mode": "inspection",
+      "note": "Return one applied effect, one absent effect, one unknown effect, and inspection coverage",
+      "requires": ["lookup.operation-effects", "store.journal.interrupted", "store.effect.observation-applied", "status.correction-indeterminate", "status.link-not-applied"],
+      "derive": ["coverage.effects-inspected"],
+      "send": [{"to": "layer", "items": ["store.journal.interrupted", "store.effect.observation-applied", "status.correction-indeterminate", "status.link-not-applied", "coverage.effects-inspected"]}]
+    },
+    {
+      "id": "return-exact-outcome",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Report every effect separately and preserve the unknown correction status",
+      "requires": ["store.effect.observation-applied", "status.correction-indeterminate", "status.link-not-applied", "coverage.effects-inspected"],
+      "derive": ["response.partial-and-indeterminate"],
+      "send": [{"to": "outside", "items": ["response.partial-and-indeterminate"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.partial-and-indeterminate"], "durable": ["store.effect.observation-applied", "status.correction-indeterminate", "status.link-not-applied"]},
+    "not_has": {"durable": ["durable.replayed-observation"]},
+    "response": "response.partial-and-indeterminate"
+  }
+}

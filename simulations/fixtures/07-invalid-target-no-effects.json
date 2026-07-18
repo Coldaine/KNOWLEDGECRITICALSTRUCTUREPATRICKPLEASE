@@ -1,0 +1,92 @@
+{
+  "id": "07-invalid-target-no-effects",
+  "title": "Reject a combined semantic change before apply when one target is unresolved",
+  "basis": ["T055-T061", "interaction-trace-7"],
+  "feasibility": "not-executable",
+  "items": {
+    "request.combined-change": "One request asks to record an observation, qualify an old reading, and link a migration operation",
+    "evidence.arc-observation": "Sourced ARC evidence",
+    "hint.n5-arc": "Resolvable N5 and ARC target hints",
+    "hint.old-reading": "Resolvable earlier interpretation hint",
+    "hint.migration-operation": "A migration operation hint that matches nothing",
+    "lookup.all-affected-targets": "A request to resolve every target before applying effects",
+    "store.entity.n5-arc": "The resolved observation target",
+    "store.claim.old-reading": "The resolved correction target",
+    "status.migration-operation-unresolved": "The durable side reports no unique migration operation",
+    "coverage.targets-complete": "The requested target search was complete",
+    "meaning.combined-effect-set": "The layer identifies observation, correction, and link effects",
+    "proposal.preview-effect-set": "A request to evaluate all effects before apply",
+    "store.contract.validate-all-before-apply": "The candidate right-side behavior validates every target before any semantic effect",
+    "result.rejected-before-apply": "The entire candidate semantic effect set is rejected before apply",
+    "response.operation-target-needed": "The caller receives the unresolved target and explicit no-effect result",
+    "durable.observation.applied": "The new observation became durable",
+    "durable.correction.applied": "The correction became durable",
+    "durable.link.applied": "The migration link became durable"
+  },
+  "initial": {
+    "outside": ["request.combined-change", "evidence.arc-observation", "hint.n5-arc", "hint.old-reading", "hint.migration-operation"],
+    "layer": [],
+    "store": [],
+    "durable": ["store.entity.n5-arc", "store.claim.old-reading", "store.contract.validate-all-before-apply"]
+  },
+  "steps": [
+    {
+      "id": "submit-combined-intent",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send one intent containing three related semantic effects",
+      "requires": ["request.combined-change", "evidence.arc-observation", "hint.n5-arc", "hint.old-reading", "hint.migration-operation"],
+      "send": [{"to": "layer", "items": ["request.combined-change", "evidence.arc-observation", "hint.n5-arc", "hint.old-reading", "hint.migration-operation"]}]
+    },
+    {
+      "id": "request-all-targets",
+      "actor": "layer",
+      "mode": "lookup",
+      "note": "Resolve every affected target before claiming the change can apply",
+      "requires": ["request.combined-change", "hint.n5-arc", "hint.old-reading", "hint.migration-operation"],
+      "derive": ["lookup.all-affected-targets"],
+      "send": [{"to": "store", "items": ["lookup.all-affected-targets", "hint.n5-arc", "hint.old-reading", "hint.migration-operation"]}]
+    },
+    {
+      "id": "return-invalid-target",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return two resolved targets and an explicit unresolved-operation result",
+      "requires": ["lookup.all-affected-targets", "store.entity.n5-arc", "store.claim.old-reading"],
+      "derive": ["status.migration-operation-unresolved", "coverage.targets-complete"],
+      "send": [{"to": "layer", "items": ["store.entity.n5-arc", "store.claim.old-reading", "status.migration-operation-unresolved", "coverage.targets-complete"]}]
+    },
+    {
+      "id": "preview-effect-set",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Describe the full effect set and expose the invalid link target",
+      "requires": ["request.combined-change", "evidence.arc-observation", "store.entity.n5-arc", "store.claim.old-reading", "status.migration-operation-unresolved", "coverage.targets-complete"],
+      "derive": ["meaning.combined-effect-set", "proposal.preview-effect-set"],
+      "send": [{"to": "store", "items": ["meaning.combined-effect-set", "proposal.preview-effect-set", "status.migration-operation-unresolved"]}]
+    },
+    {
+      "id": "reject-before-apply",
+      "actor": "store",
+      "mode": "enforcement",
+      "note": "Exercise the candidate validate-all behavior and report no semantic effects",
+      "requires": ["proposal.preview-effect-set", "status.migration-operation-unresolved", "store.contract.validate-all-before-apply"],
+      "derive": ["result.rejected-before-apply"],
+      "send": [{"to": "layer", "items": ["result.rejected-before-apply"]}]
+    },
+    {
+      "id": "return-no-effects",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Return the invalid target and state that no semantic effect was applied",
+      "requires": ["result.rejected-before-apply", "status.migration-operation-unresolved"],
+      "derive": ["response.operation-target-needed"],
+      "send": [{"to": "outside", "items": ["response.operation-target-needed"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.operation-target-needed"]},
+    "not_has": {"durable": ["durable.observation.applied", "durable.correction.applied", "durable.link.applied"]},
+    "response": "response.operation-target-needed"
+  }
+}

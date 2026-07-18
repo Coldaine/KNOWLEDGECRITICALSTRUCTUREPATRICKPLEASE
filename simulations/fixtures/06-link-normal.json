@@ -1,0 +1,97 @@
+{
+  "id": "06-link-normal",
+  "title": "Add discovery paths to one reusable knowledge piece",
+  "basis": ["T043-T048", "T051-T052", "T055-T061", "interaction-trace-6"],
+  "feasibility": "conditional",
+  "items": {
+    "request.organize-piece": "The caller asks to make one tank fact discoverable from four contexts",
+    "hint.tank-geometry-piece": "Ordinary-language or quoted-content hint for the existing piece",
+    "hint.contexts": "N5, storage, RAIDZ migration, and inference-resource planning",
+    "standing.explicit-human-organization": "The human explicitly requests the organization change",
+    "lookup.piece-contexts-links": "A request for the piece, contexts, and existing discovery paths",
+    "store.piece.tank-geometry": "The one existing tank geometry piece",
+    "store.context.n5": "The N5 context",
+    "store.context.storage": "The general storage context",
+    "store.context.migration": "The RAIDZ migration context",
+    "store.context.inference": "The inference-resource planning context",
+    "store.link.existing-n5": "An existing path from N5 to the piece",
+    "coverage.endpoints-unique": "The piece and all contexts resolve uniquely",
+    "meaning.same-piece-valid": "The meaning, time, and qualification remain the same in all four contexts",
+    "proposal.link-storage": "Proposed missing storage discovery path",
+    "proposal.link-migration": "Proposed missing migration discovery path",
+    "proposal.link-inference": "Proposed missing inference discovery path",
+    "result.links-applied": "The durable side reports all missing paths as applied",
+    "durable.link.storage": "Durable storage discovery path",
+    "durable.link.migration": "Durable migration discovery path",
+    "durable.link.inference": "Durable inference discovery path",
+    "durable.duplicate.tank-geometry": "A copied second version of the tank geometry content",
+    "response.one-piece-four-paths": "The caller receives one content reference and four confirmed discovery paths"
+  },
+  "initial": {
+    "outside": ["request.organize-piece", "hint.tank-geometry-piece", "hint.contexts", "standing.explicit-human-organization"],
+    "layer": [],
+    "store": [],
+    "durable": ["store.piece.tank-geometry", "store.context.n5", "store.context.storage", "store.context.migration", "store.context.inference", "store.link.existing-n5"]
+  },
+  "steps": [
+    {
+      "id": "submit-organization-request",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send content and context hints without relation syntax",
+      "requires": ["request.organize-piece", "hint.tank-geometry-piece", "hint.contexts", "standing.explicit-human-organization"],
+      "send": [{"to": "layer", "items": ["request.organize-piece", "hint.tank-geometry-piece", "hint.contexts", "standing.explicit-human-organization"]}]
+    },
+    {
+      "id": "request-endpoints",
+      "actor": "layer",
+      "mode": "lookup",
+      "note": "Resolve the piece, contexts, existing paths, and context-specific qualifications",
+      "requires": ["request.organize-piece", "hint.tank-geometry-piece", "hint.contexts"],
+      "derive": ["lookup.piece-contexts-links"],
+      "send": [{"to": "store", "items": ["lookup.piece-contexts-links", "hint.tank-geometry-piece", "hint.contexts"]}]
+    },
+    {
+      "id": "return-endpoints",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return unique endpoints and the existing N5 path",
+      "requires": ["lookup.piece-contexts-links", "store.piece.tank-geometry", "store.context.n5", "store.context.storage", "store.context.migration", "store.context.inference", "store.link.existing-n5"],
+      "derive": ["coverage.endpoints-unique"],
+      "send": [{"to": "layer", "items": ["store.piece.tank-geometry", "store.context.n5", "store.context.storage", "store.context.migration", "store.context.inference", "store.link.existing-n5", "coverage.endpoints-unique"]}]
+    },
+    {
+      "id": "propose-missing-paths",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Confirm reuse is semantically valid and propose only the three missing paths",
+      "requires": ["store.piece.tank-geometry", "store.context.n5", "store.context.storage", "store.context.migration", "store.context.inference", "store.link.existing-n5", "coverage.endpoints-unique", "standing.explicit-human-organization"],
+      "derive": ["meaning.same-piece-valid", "proposal.link-storage", "proposal.link-migration", "proposal.link-inference"],
+      "send": [{"to": "store", "items": ["store.piece.tank-geometry", "store.context.storage", "store.context.migration", "store.context.inference", "meaning.same-piece-valid", "proposal.link-storage", "proposal.link-migration", "proposal.link-inference", "standing.explicit-human-organization"]}]
+    },
+    {
+      "id": "apply-paths",
+      "actor": "store",
+      "mode": "enforcement",
+      "note": "Add the three discovery paths without copying content",
+      "requires": ["proposal.link-storage", "proposal.link-migration", "proposal.link-inference", "store.piece.tank-geometry", "standing.explicit-human-organization"],
+      "derive": ["result.links-applied", "durable.link.storage", "durable.link.migration", "durable.link.inference"],
+      "persist": ["durable.link.storage", "durable.link.migration", "durable.link.inference"],
+      "send": [{"to": "layer", "items": ["result.links-applied"]}]
+    },
+    {
+      "id": "return-paths",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Return one piece and all four confirmed paths",
+      "requires": ["result.links-applied", "store.piece.tank-geometry", "store.link.existing-n5"],
+      "derive": ["response.one-piece-four-paths"],
+      "send": [{"to": "outside", "items": ["response.one-piece-four-paths"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.one-piece-four-paths"], "durable": ["store.piece.tank-geometry", "store.link.existing-n5", "durable.link.storage", "durable.link.migration", "durable.link.inference"]},
+    "not_has": {"durable": ["durable.duplicate.tank-geometry"]},
+    "response": "response.one-piece-four-paths"
+  }
+}

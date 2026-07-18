@@ -1,0 +1,86 @@
+{
+  "id": "04-conflict-unsupported-winner",
+  "title": "Reject a proposed winner when no source-precedence rule supports it",
+  "basis": ["T022-T024", "T046-T052", "T055-T061", "interaction-trace-4-pressure"],
+  "feasibility": "conditional",
+  "items": {
+    "request.resolve-conflict": "The caller asks whether new evidence resolves the disk-role conflict",
+    "evidence.new-source": "A newer source says the disk joined tank",
+    "target.hint.fourth-disk": "The caller identifies the disputed disk only by migration context",
+    "lookup.conflict-context": "A request for competing claims and applicable source policy",
+    "store.claim.independent-source": "The earlier independent-source claim",
+    "store.claim.disk-joined": "The newer joined-pool claim",
+    "store.policy.no-precedence-rule": "No stored rule says newer automatically wins",
+    "coverage.conflict-context-complete": "The requested conflict context and source policy were searched",
+    "proposal.promote-new-winner": "A semantic proposal that the newer claim should become the winner",
+    "result.winner-rejected": "The durable side rejects the unsupported winner",
+    "response.conflict-remains": "The caller is told that the conflict remains and why recency alone was insufficient",
+    "durable.winner.disk-joined": "The newer claim was promoted as the winner"
+  },
+  "initial": {
+    "outside": ["request.resolve-conflict", "evidence.new-source", "target.hint.fourth-disk"],
+    "layer": [],
+    "store": [],
+    "durable": ["store.claim.independent-source", "store.claim.disk-joined", "store.policy.no-precedence-rule"]
+  },
+  "steps": [
+    {
+      "id": "submit-resolution-request",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Ask whether the newer source resolves the conflict",
+      "requires": ["request.resolve-conflict", "evidence.new-source", "target.hint.fourth-disk"],
+      "send": [{"to": "layer", "items": ["request.resolve-conflict", "evidence.new-source", "target.hint.fourth-disk"]}]
+    },
+    {
+      "id": "request-conflict-context",
+      "actor": "layer",
+      "mode": "lookup",
+      "note": "Retrieve both claims and any rule governing source precedence",
+      "requires": ["request.resolve-conflict", "target.hint.fourth-disk"],
+      "derive": ["lookup.conflict-context"],
+      "send": [{"to": "store", "items": ["lookup.conflict-context", "target.hint.fourth-disk"]}]
+    },
+    {
+      "id": "return-conflict-context",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return both claims and the explicit absence of an automatic recency rule",
+      "requires": ["lookup.conflict-context", "store.claim.independent-source", "store.claim.disk-joined", "store.policy.no-precedence-rule"],
+      "derive": ["coverage.conflict-context-complete"],
+      "send": [{"to": "layer", "items": ["store.claim.independent-source", "store.claim.disk-joined", "store.policy.no-precedence-rule", "coverage.conflict-context-complete"]}]
+    },
+    {
+      "id": "propose-unsupported-winner",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Exercise enforcement with an unsupported winner proposal",
+      "requires": ["evidence.new-source", "store.claim.independent-source", "store.claim.disk-joined", "coverage.conflict-context-complete"],
+      "derive": ["proposal.promote-new-winner"],
+      "send": [{"to": "store", "items": ["proposal.promote-new-winner", "store.claim.independent-source", "store.claim.disk-joined"]}]
+    },
+    {
+      "id": "reject-winner",
+      "actor": "store",
+      "mode": "enforcement",
+      "note": "Reject promotion because no applicable source-precedence rule supports it",
+      "requires": ["proposal.promote-new-winner", "store.policy.no-precedence-rule"],
+      "derive": ["result.winner-rejected"],
+      "send": [{"to": "layer", "items": ["result.winner-rejected"]}]
+    },
+    {
+      "id": "return-unresolved-conflict",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Explain that the conflict remains and recency alone was insufficient",
+      "requires": ["result.winner-rejected", "store.policy.no-precedence-rule"],
+      "derive": ["response.conflict-remains"],
+      "send": [{"to": "outside", "items": ["response.conflict-remains"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.conflict-remains"]},
+    "not_has": {"durable": ["durable.winner.disk-joined"]},
+    "response": "response.conflict-remains"
+  }
+}

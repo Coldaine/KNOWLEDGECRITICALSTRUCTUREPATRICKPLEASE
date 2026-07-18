@@ -1,0 +1,63 @@
+{
+  "id": "05-retry-indeterminate",
+  "title": "Do not replay when the earlier outcome cannot be established",
+  "basis": ["T057-T060", "interaction-trace-5-pressure"],
+  "feasibility": "protocol-dependent",
+  "items": {
+    "request.retry": "The caller retries after a lost response",
+    "request.operation-id": "The caller supplies the earlier operation identity",
+    "request.content": "The repeated evidence and qualification",
+    "lookup.prior-outcome": "A request for the durable outcome",
+    "store.prior-operation-id": "The durable operation identity exists",
+    "store.outcome-indeterminate": "The durable side cannot establish whether effects completed",
+    "response.reconciliation-required": "The caller receives an indeterminate result and reconciliation need",
+    "durable.replayed-effect": "A new effect created by blindly replaying the request"
+  },
+  "initial": {
+    "outside": ["request.retry", "request.operation-id", "request.content"],
+    "layer": [],
+    "store": [],
+    "durable": ["store.prior-operation-id", "store.outcome-indeterminate"]
+  },
+  "steps": [
+    {
+      "id": "submit-retry",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send the retry with the earlier operation identity",
+      "requires": ["request.retry", "request.operation-id", "request.content"],
+      "send": [{"to": "layer", "items": ["request.retry", "request.operation-id", "request.content"]}]
+    },
+    {
+      "id": "request-prior-outcome",
+      "actor": "layer",
+      "mode": "protocol",
+      "note": "Ask the durable side to establish the earlier effects",
+      "requires": ["request.retry", "request.operation-id", "request.content"],
+      "derive": ["lookup.prior-outcome"],
+      "send": [{"to": "store", "items": ["lookup.prior-outcome", "request.operation-id", "request.content"]}]
+    },
+    {
+      "id": "return-indeterminate",
+      "actor": "store",
+      "mode": "protocol",
+      "note": "Report that the earlier outcome cannot currently be established",
+      "requires": ["lookup.prior-outcome", "store.prior-operation-id", "store.outcome-indeterminate"],
+      "send": [{"to": "layer", "items": ["store.outcome-indeterminate"]}]
+    },
+    {
+      "id": "return-reconciliation-need",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Return indeterminate instead of blindly replaying",
+      "requires": ["store.outcome-indeterminate"],
+      "derive": ["response.reconciliation-required"],
+      "send": [{"to": "outside", "items": ["response.reconciliation-required"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.reconciliation-required"]},
+    "not_has": {"durable": ["durable.replayed-effect"]},
+    "response": "response.reconciliation-required"
+  }
+}

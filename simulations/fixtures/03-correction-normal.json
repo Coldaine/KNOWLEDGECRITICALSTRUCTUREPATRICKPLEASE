@@ -1,0 +1,95 @@
+{
+  "id": "03-correction-normal",
+  "title": "Qualify one unambiguous mistaken interpretation while preserving history",
+  "basis": ["T040-T042", "T055-T061", "interaction-trace-3"],
+  "feasibility": "conditional",
+  "items": {
+    "request.correct-reading": "The caller asks to correct the earlier ARC interpretation",
+    "correction.config-not-requirement": "The live 2 GiB cap is not an accepted hardware requirement",
+    "target.hint.old-arc-reading": "A plain-language hint identifying the earlier inference-memory claim",
+    "standing.explicit-human-correction": "The correction is supplied explicitly by the human operator",
+    "lookup.correction-target": "A bounded request for candidate targets and history",
+    "store.observation.arc-2g": "The sourced live configuration observation",
+    "store.claim.old-mistaken-reading": "The exact earlier interpretation to qualify",
+    "store.source.old-reading": "The source and history of the earlier interpretation",
+    "coverage.target-unique-current": "One target is unique and unchanged since retrieval",
+    "meaning.qualification": "The layer classifies the correction as a qualification of the older interpretation",
+    "proposal.qualify-target": "A proposed history-preserving qualification of the exact target",
+    "result.qualification-applied": "The store reports the qualification as applied",
+    "durable.correction.config-not-requirement": "The durable correction",
+    "durable.relation.old-reading-qualified": "The durable relationship from correction to earlier interpretation",
+    "durable.current-reading.config-not-policy": "The resulting current reading",
+    "response.correction-applied": "The caller receives the new reading and preserved history",
+    "durable.old-reading-erased": "The earlier interpretation was destructively erased"
+  },
+  "initial": {
+    "outside": ["request.correct-reading", "correction.config-not-requirement", "target.hint.old-arc-reading", "standing.explicit-human-correction"],
+    "layer": [],
+    "store": [],
+    "durable": ["store.observation.arc-2g", "store.claim.old-mistaken-reading", "store.source.old-reading"]
+  },
+  "steps": [
+    {
+      "id": "submit-correction",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send the correction, target hint, and explicit standing",
+      "requires": ["request.correct-reading", "correction.config-not-requirement", "target.hint.old-arc-reading", "standing.explicit-human-correction"],
+      "send": [{"to": "layer", "items": ["request.correct-reading", "correction.config-not-requirement", "target.hint.old-arc-reading", "standing.explicit-human-correction"]}]
+    },
+    {
+      "id": "request-target",
+      "actor": "layer",
+      "mode": "lookup",
+      "note": "Ask for candidate targets, history, and current target state",
+      "requires": ["request.correct-reading", "target.hint.old-arc-reading"],
+      "derive": ["lookup.correction-target"],
+      "send": [{"to": "store", "items": ["lookup.correction-target", "target.hint.old-arc-reading"]}]
+    },
+    {
+      "id": "return-unique-target",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return the exact target, observation, source history, and unique-current status",
+      "requires": ["lookup.correction-target", "store.observation.arc-2g", "store.claim.old-mistaken-reading", "store.source.old-reading"],
+      "derive": ["coverage.target-unique-current"],
+      "send": [{"to": "layer", "items": ["store.observation.arc-2g", "store.claim.old-mistaken-reading", "store.source.old-reading", "coverage.target-unique-current"]}]
+    },
+    {
+      "id": "propose-qualification",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Classify the new meaning and propose a history-preserving relationship",
+      "requires": ["correction.config-not-requirement", "standing.explicit-human-correction", "store.observation.arc-2g", "store.claim.old-mistaken-reading", "coverage.target-unique-current"],
+      "derive": ["meaning.qualification", "proposal.qualify-target"],
+      "send": [{"to": "store", "items": ["correction.config-not-requirement", "standing.explicit-human-correction", "store.claim.old-mistaken-reading", "coverage.target-unique-current", "meaning.qualification", "proposal.qualify-target"]}]
+    },
+    {
+      "id": "apply-qualification",
+      "actor": "store",
+      "mode": "enforcement",
+      "note": "Apply the correction without deleting the earlier source or interpretation",
+      "requires": ["proposal.qualify-target", "coverage.target-unique-current", "standing.explicit-human-correction"],
+      "derive": ["result.qualification-applied", "durable.correction.config-not-requirement", "durable.relation.old-reading-qualified", "durable.current-reading.config-not-policy"],
+      "persist": ["durable.correction.config-not-requirement", "durable.relation.old-reading-qualified", "durable.current-reading.config-not-policy"],
+      "send": [{"to": "layer", "items": ["result.qualification-applied"]}]
+    },
+    {
+      "id": "return-corrected-reading",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Return the new current reading and explain that the earlier history remains",
+      "requires": ["result.qualification-applied", "store.source.old-reading"],
+      "derive": ["response.correction-applied"],
+      "send": [{"to": "outside", "items": ["response.correction-applied"]}]
+    }
+  ],
+  "expected": {
+    "has": {
+      "outside": ["response.correction-applied"],
+      "durable": ["store.claim.old-mistaken-reading", "store.source.old-reading", "durable.correction.config-not-requirement", "durable.relation.old-reading-qualified", "durable.current-reading.config-not-policy"]
+    },
+    "not_has": {"durable": ["durable.old-reading-erased"]},
+    "response": "response.correction-applied"
+  }
+}

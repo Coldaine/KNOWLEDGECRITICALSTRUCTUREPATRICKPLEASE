@@ -1,0 +1,65 @@
+{
+  "id": "03-correction-ambiguous-target",
+  "title": "Return candidate targets instead of guessing which claim to correct",
+  "basis": ["T040-T042", "T055-T061", "interaction-trace-3-pressure"],
+  "feasibility": "conditional",
+  "items": {
+    "request.correct-reading": "The caller asks to correct an earlier ARC interpretation",
+    "correction.config-not-requirement": "The live 2 GiB cap is not an accepted hardware requirement",
+    "target.hint.arc-reading": "The target hint does not distinguish two earlier statements",
+    "lookup.correction-target": "A bounded request for candidate targets",
+    "store.claim.candidate-a": "One plausible earlier ARC interpretation",
+    "store.claim.candidate-b": "A second plausible earlier ARC interpretation",
+    "coverage.target-ambiguous": "The store reports that the hint does not select one target",
+    "response.choose-target": "The caller receives both candidates and the distinction needed to choose",
+    "durable.correction.applied": "A correction applied to one guessed target"
+  },
+  "initial": {
+    "outside": ["request.correct-reading", "correction.config-not-requirement", "target.hint.arc-reading"],
+    "layer": [],
+    "store": [],
+    "durable": ["store.claim.candidate-a", "store.claim.candidate-b"]
+  },
+  "steps": [
+    {
+      "id": "submit-correction",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send a correction with an insufficient target hint",
+      "requires": ["request.correct-reading", "correction.config-not-requirement", "target.hint.arc-reading"],
+      "send": [{"to": "layer", "items": ["request.correct-reading", "correction.config-not-requirement", "target.hint.arc-reading"]}]
+    },
+    {
+      "id": "request-target",
+      "actor": "layer",
+      "mode": "lookup",
+      "note": "Ask for candidate targets rather than selecting from prose alone",
+      "requires": ["request.correct-reading", "target.hint.arc-reading"],
+      "derive": ["lookup.correction-target"],
+      "send": [{"to": "store", "items": ["lookup.correction-target", "target.hint.arc-reading"]}]
+    },
+    {
+      "id": "return-ambiguous-targets",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return both candidates and explicit ambiguity",
+      "requires": ["lookup.correction-target", "store.claim.candidate-a", "store.claim.candidate-b"],
+      "derive": ["coverage.target-ambiguous"],
+      "send": [{"to": "layer", "items": ["store.claim.candidate-a", "store.claim.candidate-b", "coverage.target-ambiguous"]}]
+    },
+    {
+      "id": "return-clarification",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Expose the candidates and stop without a mutation",
+      "requires": ["store.claim.candidate-a", "store.claim.candidate-b", "coverage.target-ambiguous"],
+      "derive": ["response.choose-target"],
+      "send": [{"to": "outside", "items": ["response.choose-target"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.choose-target"]},
+    "not_has": {"durable": ["durable.correction.applied"]},
+    "response": "response.choose-target"
+  }
+}

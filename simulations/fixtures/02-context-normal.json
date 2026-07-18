@@ -1,0 +1,105 @@
+{
+  "id": "02-context-normal",
+  "title": "Return bounded N5 investigation context with explicit coverage",
+  "basis": ["T046-T052", "T055-T060", "interaction-trace-2"],
+  "feasibility": "plausible",
+  "items": {
+    "request.diagnose-disk-activity": "The caller is diagnosing current N5 disk activity",
+    "scope.n5-storage": "The request is scoped to N5 storage",
+    "time.as-of-request": "The caller supplies an as-of time",
+    "budget.bounded": "The caller requests a bounded response",
+    "rule.absence-needs-coverage": "An empty result is not global absence without coverage information",
+    "query.task-categories": "A request for identity, topology, activity, safety, operations, and sources",
+    "store.entity.n5": "The unique durable N5 identity",
+    "store.topology.current": "Current N5 pool and disk topology",
+    "store.activity.current": "Current disk-reading operation",
+    "store.safety.protected-source": "The active protected-source constraint",
+    "store.operation.unfinished": "The unfinished verification operation",
+    "store.sources.task-material": "Source pointers for the returned material",
+    "coverage.requested-categories-complete": "Every requested category was searched without truncation",
+    "response.context-capsule": "A bounded capsule containing topology, activity, safety, unfinished work, sources, and currentness",
+    "durable.canonical-capsule": "A generated task capsule stored as canonical knowledge"
+  },
+  "initial": {
+    "outside": ["request.diagnose-disk-activity", "scope.n5-storage", "time.as-of-request", "budget.bounded"],
+    "layer": ["rule.absence-needs-coverage"],
+    "store": [],
+    "durable": [
+      "store.entity.n5",
+      "store.topology.current",
+      "store.activity.current",
+      "store.safety.protected-source",
+      "store.operation.unfinished",
+      "store.sources.task-material"
+    ]
+  },
+  "steps": [
+    {
+      "id": "submit-task",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send the task, scope, time, and response limit",
+      "requires": ["request.diagnose-disk-activity", "scope.n5-storage", "time.as-of-request", "budget.bounded"],
+      "send": [{"to": "layer", "items": ["request.diagnose-disk-activity", "scope.n5-storage", "time.as-of-request", "budget.bounded"]}]
+    },
+    {
+      "id": "request-task-material",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Decompose the task into the categories needed for a safe answer",
+      "requires": ["request.diagnose-disk-activity", "scope.n5-storage", "time.as-of-request", "budget.bounded", "rule.absence-needs-coverage"],
+      "derive": ["query.task-categories"],
+      "send": [{"to": "store", "items": ["query.task-categories", "scope.n5-storage", "time.as-of-request", "budget.bounded"]}]
+    },
+    {
+      "id": "return-task-material",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return bounded task material and state that every requested category was covered",
+      "requires": [
+        "query.task-categories",
+        "store.entity.n5",
+        "store.topology.current",
+        "store.activity.current",
+        "store.safety.protected-source",
+        "store.operation.unfinished",
+        "store.sources.task-material"
+      ],
+      "derive": ["coverage.requested-categories-complete"],
+      "send": [{
+        "to": "layer",
+        "items": [
+          "store.entity.n5",
+          "store.topology.current",
+          "store.activity.current",
+          "store.safety.protected-source",
+          "store.operation.unfinished",
+          "store.sources.task-material",
+          "coverage.requested-categories-complete"
+        ]
+      }]
+    },
+    {
+      "id": "return-capsule",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Assemble only supported task context and preserve the safety constraint",
+      "requires": [
+        "store.entity.n5",
+        "store.topology.current",
+        "store.activity.current",
+        "store.safety.protected-source",
+        "store.operation.unfinished",
+        "store.sources.task-material",
+        "coverage.requested-categories-complete"
+      ],
+      "derive": ["response.context-capsule"],
+      "send": [{"to": "outside", "items": ["response.context-capsule"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.context-capsule"]},
+    "not_has": {"durable": ["durable.canonical-capsule"]},
+    "response": "response.context-capsule"
+  }
+}

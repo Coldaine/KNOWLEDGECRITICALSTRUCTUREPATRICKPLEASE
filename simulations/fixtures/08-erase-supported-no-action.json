@@ -1,0 +1,136 @@
+{
+  "id": "08-erase-supported-no-action",
+  "title": "Return supported when exact verification evidence satisfies the stored precondition",
+  "basis": ["T013-T024", "T043-T052", "T055-T061", "interaction-trace-8-pressure"],
+  "feasibility": "conditional",
+  "items": {
+    "request.can-erase-fourth-disk": "The caller asks whether the fourth disk may now be erased and added to tank",
+    "scope.n5-migration": "The request is scoped to the N5 migration",
+    "time.as-of-request": "The caller supplies the decision time",
+    "rule.read-only-no-world-action": "The translation layer can answer but cannot erase a disk or alter a pool",
+    "query.resolve-and-evaluate": "A bounded request for identity and every destructive precondition",
+    "store.entity.tank": "The unique tank pool",
+    "store.entity.fourth-disk": "The unique protected migration-source disk",
+    "store.topology.current": "Current topology shows the disk outside tank",
+    "store.disk-role.independent-source": "The disk is the independent migration source",
+    "store.copy.completed": "The copy operation completed",
+    "store.safety.verify-before-erase": "The destructive precondition requires successful retained verification evidence",
+    "store.verification.method-qualifies": "The recorded verification method covers byte content for the intended source and target",
+    "store.verification.scope-exact": "The recorded verification scope matches the identified source and target",
+    "store.verification.success-output": "Successful output was retained",
+    "store.verification.exit-success": "A successful exit result was retained",
+    "coverage.all-preconditions-complete": "Identity, topology, copy, rule, verification, and sources were completely retrieved",
+    "meaning.preconditions-supported": "The layer finds every stored precondition supported by exact evidence",
+    "response.erase-supported-no-action": "The caller receives supported with citations, remaining risks, and no-action notice",
+    "durable.generated-safety-answer": "The generated answer was stored as canonical knowledge",
+    "world.disk-erased": "The fourth disk was erased",
+    "world.disk-added-to-tank": "The fourth disk was added to tank"
+  },
+  "initial": {
+    "outside": ["request.can-erase-fourth-disk", "scope.n5-migration", "time.as-of-request"],
+    "layer": ["rule.read-only-no-world-action"],
+    "store": [],
+    "durable": [
+      "store.entity.tank",
+      "store.entity.fourth-disk",
+      "store.topology.current",
+      "store.disk-role.independent-source",
+      "store.copy.completed",
+      "store.safety.verify-before-erase",
+      "store.verification.method-qualifies",
+      "store.verification.scope-exact",
+      "store.verification.success-output",
+      "store.verification.exit-success"
+    ]
+  },
+  "steps": [
+    {
+      "id": "submit-question",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send the bounded destructive-precondition question",
+      "requires": ["request.can-erase-fourth-disk", "scope.n5-migration", "time.as-of-request"],
+      "send": [{"to": "layer", "items": ["request.can-erase-fourth-disk", "scope.n5-migration", "time.as-of-request"]}]
+    },
+    {
+      "id": "request-evidence-chain",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Request identity and every category needed by the destructive precondition",
+      "requires": ["request.can-erase-fourth-disk", "scope.n5-migration", "time.as-of-request"],
+      "derive": ["query.resolve-and-evaluate"],
+      "send": [{"to": "store", "items": ["query.resolve-and-evaluate", "scope.n5-migration", "time.as-of-request"]}]
+    },
+    {
+      "id": "return-complete-evidence-chain",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return unique identities and complete, exact precondition evidence",
+      "requires": [
+        "query.resolve-and-evaluate",
+        "store.entity.tank",
+        "store.entity.fourth-disk",
+        "store.topology.current",
+        "store.disk-role.independent-source",
+        "store.copy.completed",
+        "store.safety.verify-before-erase",
+        "store.verification.method-qualifies",
+        "store.verification.scope-exact",
+        "store.verification.success-output",
+        "store.verification.exit-success"
+      ],
+      "derive": ["coverage.all-preconditions-complete"],
+      "send": [{
+        "to": "layer",
+        "items": [
+          "store.entity.tank",
+          "store.entity.fourth-disk",
+          "store.topology.current",
+          "store.disk-role.independent-source",
+          "store.copy.completed",
+          "store.safety.verify-before-erase",
+          "store.verification.method-qualifies",
+          "store.verification.scope-exact",
+          "store.verification.success-output",
+          "store.verification.exit-success",
+          "coverage.all-preconditions-complete"
+        ]
+      }]
+    },
+    {
+      "id": "evaluate-supported",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Compare exact evidence with the stored precondition and find each element supported",
+      "requires": [
+        "store.entity.tank",
+        "store.entity.fourth-disk",
+        "store.topology.current",
+        "store.disk-role.independent-source",
+        "store.copy.completed",
+        "store.safety.verify-before-erase",
+        "store.verification.method-qualifies",
+        "store.verification.scope-exact",
+        "store.verification.success-output",
+        "store.verification.exit-success",
+        "coverage.all-preconditions-complete",
+        "rule.read-only-no-world-action"
+      ],
+      "derive": ["meaning.preconditions-supported"]
+    },
+    {
+      "id": "return-supported-no-action",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Return supported with the evidence chain while performing no erase or pool mutation",
+      "requires": ["meaning.preconditions-supported", "rule.read-only-no-world-action"],
+      "derive": ["response.erase-supported-no-action"],
+      "send": [{"to": "outside", "items": ["response.erase-supported-no-action"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.erase-supported-no-action"]},
+    "not_has": {"durable": ["durable.generated-safety-answer", "world.disk-erased", "world.disk-added-to-tank"]},
+    "response": "response.erase-supported-no-action"
+  }
+}
