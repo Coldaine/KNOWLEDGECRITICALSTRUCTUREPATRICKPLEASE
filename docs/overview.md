@@ -102,7 +102,7 @@ The answers should expose the capabilities and possible states worth designing. 
 
 ## Current truth
 
-- The transcript contains the user-stated direction, confirmed topology, and corrections that produced the current synthesis.
-- The current workflows and fixtures are candidate probes written by the assistant; they are not user-accepted product behavior.
-- The replay harness checks declared information flow. It does not prove that a model can perform the central semantic work or that retrieval and automatic organization are solved.
-- No runtime knowledge backend or internal translation service exists yet.
+- The [verbatim transcript](../source/origin-conversation-verbatim.md) contains the user-stated direction, confirmed topology, and corrections that produced the current synthesis.
+- The current [workflows](workflows.md), [interaction traces](interaction-traces.md), and [fixtures](../simulations/README.md) are candidate probes written by the assistant; they are not user-accepted product behavior.
+- The [replay harness](../tools/run_simulations.py) checks declared information flow. Its [documented limits](simulation-plan.md#what-remains-unproven) make no claim that a model can perform the central semantic work or that retrieval and automatic organization are solved.
+- The [current design status](simulation-plan.md) contains no runtime knowledge backend or internal translation service.

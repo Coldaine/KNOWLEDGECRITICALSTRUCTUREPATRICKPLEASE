@@ -165,6 +165,44 @@ class ReplayValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(TraceError, "final transfer of the final step"):
             self.replay_fixture(fixture)
 
+    def test_rejects_reversed_durable_event_order(self) -> None:
+        fixture = minimal_fixture()
+        fixture["items"]["durable.second"] = "A second durable effect"
+        fixture["steps"].insert(
+            1,
+            {
+                "id": "derive-two-effects",
+                "actor": "layer",
+                "mode": "semantic",
+                "note": "Derive two ordered effects",
+                "requires": ["request"],
+                "derive": ["durable.unexpected", "durable.second"],
+                "send": [
+                    {
+                        "to": "store",
+                        "items": ["durable.unexpected", "durable.second"],
+                    }
+                ],
+            },
+        )
+        fixture["steps"].insert(
+            2,
+            {
+                "id": "persist-two-effects",
+                "actor": "store",
+                "mode": "enforcement",
+                "note": "Persist both effects in declared order",
+                "requires": ["durable.unexpected", "durable.second"],
+                "persist": ["durable.unexpected", "durable.second"],
+            },
+        )
+        fixture["expected"]["durable_added"] = [
+            "durable.second",
+            "durable.unexpected",
+        ]
+        with self.assertRaisesRegex(TraceError, "durable addition events differ"):
+            self.replay_fixture(fixture)
+
 
 if __name__ == "__main__":
     unittest.main()

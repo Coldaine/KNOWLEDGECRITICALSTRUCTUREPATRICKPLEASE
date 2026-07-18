@@ -24,7 +24,7 @@ Use `--verbose` to print the full left/right replay. Pass one or more fixture st
 - Every declared step prerequisite is already held by its actor or available to the durable side.
 - The outside actor never bypasses the translation layer to manipulate the durable side.
 - The translation layer never sends information it does not have.
-- Every durable addition/removal event and the one terminal layer-to-outside response match the fixture oracle.
+- The ordered sequence of durable addition/removal events and the one terminal layer-to-outside response match the fixture oracle.
 - A failure or ambiguity can remain explicit instead of being filled by hidden context.
 
 ## What it does not prove

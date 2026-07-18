@@ -317,15 +317,15 @@ def replay(path: Path, verbose: bool = False) -> tuple[str, int, str]:
     durable_removed = expect_list(expected.get("durable_removed"), f"{fixture_id}.expected.durable_removed")
     check_known(durable_added, known, f"{fixture_id}.expected.durable_added")
     check_known(durable_removed, known, f"{fixture_id}.expected.durable_removed")
-    if sorted(durable_addition_events) != sorted(durable_added):
+    if durable_addition_events != durable_added:
         raise TraceError(
-            f"{fixture_id}: durable addition events differ; expected {sorted(durable_added)}, "
-            f"observed {sorted(durable_addition_events)}"
+            f"{fixture_id}: durable addition events differ; expected {durable_added}, "
+            f"observed {durable_addition_events}"
         )
-    if sorted(durable_removal_events) != sorted(durable_removed):
+    if durable_removal_events != durable_removed:
         raise TraceError(
-            f"{fixture_id}: durable removal events differ; expected {sorted(durable_removed)}, "
-            f"observed {sorted(durable_removal_events)}"
+            f"{fixture_id}: durable removal events differ; expected {durable_removed}, "
+            f"observed {durable_removal_events}"
         )
 
     return f"{fixture_id}: {title}", len(steps), feasibility

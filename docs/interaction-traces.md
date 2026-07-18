@@ -395,7 +395,7 @@ No requested contexts, links, relation types, or store identifiers
 | 4 | R→T | Return unique or ambiguous subjects, an explicit duplicate-match result, related pieces, context candidates, path/basis, current standing, and search coverage. | None |
 | 5 | T | Compare the bounded candidates. Treat direct subject associations separately from broader contextual relationships. Keep weakly supported candidates provisional. | None |
 | 6 | T→R | Propose separate effects: retain source, record observation, associate direct subjects, add supported discovery paths, and retain weaker contextual suggestions with their basis and provisional standing. | None until evaluated |
-| 7 | R→T | Return accepted, unchanged, provisional, rejected, or indeterminate status and a resulting reference for every content and organization effect. | Only effects explicitly reported |
+| 7 | R→T | Return accepted, rejected, unchanged, or indeterminate persistence outcome and a resulting reference for every content and organization effect. Return relationship standing, such as provisional, separately. | Only effects explicitly reported |
 | 8 | T→L | Report what was recorded, accepted discovery paths, provisional suggestions, rejected ambiguity, and the next distinction needed. | None |
 
 **Expected ending state**
@@ -403,7 +403,7 @@ No requested contexts, links, relation types, or store identifiers
 - The duplicate search explicitly found no existing observation, so one source and observation are created; the content is not copied for each context.
 - N5 and `tank` are direct discovery paths.
 - A storage path is accepted only when the returned basis supports it.
-- Migration and inference-planning paths may remain provisional when their relevance is inferred rather than supplied or directly evidenced.
+- Migration and inference-planning paths may be accepted for storage while retaining provisional relationship standing when their relevance is inferred rather than supplied or directly evidenced.
 - Every relationship retains its own basis and outcome.
 
 **Feasibility ledger**

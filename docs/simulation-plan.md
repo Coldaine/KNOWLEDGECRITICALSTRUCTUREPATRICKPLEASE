@@ -44,7 +44,7 @@ Use `--verbose` to inspect every boundary crossing.
 - A participant cannot send information it never received or derived.
 - Only the durable side can add or remove durable tokens.
 - Expected returned, durable, and forbidden tokens match the candidate trace.
-- Every durable addition/removal event and the one terminal layer-to-outside response match the fixture oracle.
+- The ordered sequence of durable addition/removal events and the one terminal layer-to-outside response match the fixture oracle.
 
 The fixture items are deliberately opaque. The runner has no entity model, claim schema, relation vocabulary, database query, API, or universal lifecycle.
 

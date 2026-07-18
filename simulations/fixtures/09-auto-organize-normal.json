@@ -34,8 +34,10 @@
     "result.n5-link-applied": "The N5 path was accepted with a resulting reference",
     "result.tank-link-applied": "The tank path was accepted with a resulting reference",
     "result.storage-link-applied": "The storage path was accepted with a resulting reference",
-    "result.migration-link-provisional": "The migration path was retained as provisional with a resulting reference",
-    "result.inference-link-provisional": "The inference-planning path was retained as provisional with a resulting reference",
+    "result.migration-link-accepted": "The migration relationship was accepted for storage with a resulting reference",
+    "standing.migration-link-provisional": "The stored migration relationship retains provisional semantic standing",
+    "result.inference-link-accepted": "The inference-planning relationship was accepted for storage with a resulting reference",
+    "standing.inference-link-provisional": "The stored inference-planning relationship retains provisional semantic standing",
     "durable.source.tank-geometry": "Retained source for the geometry observation",
     "durable.observation.tank-geometry": "One durable geometry observation",
     "durable.link.n5": "Direct N5 discovery path",
@@ -209,8 +211,10 @@
         "result.n5-link-applied",
         "result.tank-link-applied",
         "result.storage-link-applied",
-        "result.migration-link-provisional",
-        "result.inference-link-provisional",
+        "result.migration-link-accepted",
+        "standing.migration-link-provisional",
+        "result.inference-link-accepted",
+        "standing.inference-link-provisional",
         "durable.source.tank-geometry",
         "durable.observation.tank-geometry",
         "durable.link.n5",
@@ -236,8 +240,10 @@
           "result.n5-link-applied",
           "result.tank-link-applied",
           "result.storage-link-applied",
-          "result.migration-link-provisional",
-          "result.inference-link-provisional"
+          "result.migration-link-accepted",
+          "standing.migration-link-provisional",
+          "result.inference-link-accepted",
+          "standing.inference-link-provisional"
         ]
       }]
     },
@@ -252,8 +258,10 @@
         "result.n5-link-applied",
         "result.tank-link-applied",
         "result.storage-link-applied",
-        "result.migration-link-provisional",
-        "result.inference-link-provisional"
+        "result.migration-link-accepted",
+        "standing.migration-link-provisional",
+        "result.inference-link-accepted",
+        "standing.inference-link-provisional"
       ],
       "derive": ["response.auto-organized"],
       "send": [{"to": "outside", "items": ["response.auto-organized"]}]

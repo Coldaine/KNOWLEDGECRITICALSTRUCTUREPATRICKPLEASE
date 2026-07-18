@@ -25,8 +25,8 @@ These are probes and durable design-spike evidence, not the identity of the proj
 
 ## Current phase
 
-- The complete 98-entry conversation is preserved verbatim and checksummed in the [manifest](source/SHA256SUMS).
+- The [complete 98-entry conversation](source/origin-conversation-verbatim.md) is preserved verbatim and checksummed in the [manifest](source/SHA256SUMS).
 - [The overview](docs/overview.md) now states the transcript-grounded product thesis and why each part of the boundary exists.
-- Nine workflow stories and 18 fixtures are candidate design probes. Their 97 declared steps are dataflow-checked, not proof of semantic intelligence or accepted product behavior.
-- Automatic organization, semantic writeback, correction, conflict handling, and contextual retrieval remain the central unproven capabilities.
-- No database, graph model, ontology, runtime API, permanent component name, or production architecture has been selected.
+- Nine [workflow stories](docs/workflows.md) and 18 [fixtures](simulations/README.md) are candidate design probes. Their 97 declared steps are checked by the [replay tool](tools/run_simulations.py), not proof of semantic intelligence or accepted product behavior.
+- [Automatic organization, semantic writeback, correction, conflict handling, and contextual retrieval](docs/simulation-plan.md#what-remains-unproven) remain the central unproven capabilities.
+- The [current synthesis](docs/overview.md#current-truth) selects no database, graph model, ontology, runtime API, permanent component name, or production architecture.
