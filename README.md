@@ -1,30 +1,32 @@
 # KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE
 
-The name is intentionally hard to ignore. This repository gets a critical knowledge-system idea out of one conversation and into durable material that can be inspected, corrected, simulated, and eventually implemented. ([T063](source/origin-conversation-verbatim.md#t063---user), [T066](source/origin-conversation-verbatim.md#t066---user---interactive-response))
+This repository preserves a hard-won product understanding: build an agent-native personal-scale knowledge-and-decision service whose normal agent-facing semantic interface is a narrow, stateless LLM translation layer inside the knowledge boundary. Broad work agents remain free and structure-blind; the internal layer mediates interpretation, encoding, automatic organization, storage, correction, retrieval, and useful return context through controlled knowledge-side tools. ([T055](source/origin-conversation-verbatim.md#t055---user), [T057](source/origin-conversation-verbatim.md#t057---user), [T059](source/origin-conversation-verbatim.md#t059---user), [T061](source/origin-conversation-verbatim.md#t061---user))
 
-This is not a software architecture yet. It preserves the source, states the intent, and works from concrete behavior toward a design. ([T061](source/origin-conversation-verbatim.md#t061---user), [T063](source/origin-conversation-verbatim.md#t063---user))
+The graph, documents, workflows, state vocabulary, and harness are not the product. The transcript records why this boundary exists; the derived material should preserve and pressure-test that understanding without replacing it with process.
 
-## Read in this order
+## Core understanding
 
-1. [Verbatim origin conversation](source/origin-conversation-verbatim.md), its [provenance](source/provenance.md), and the [checksum manifest](source/SHA256SUMS)
-2. [Overview](docs/overview.md)
-3. [Intent and corrections](docs/intent-and-corrections.md)
-4. [Goals and working requirements](docs/goals-and-requirements.md)
-5. [Knowledge structure under test](docs/knowledge-structure.md)
-6. [Information flow across the knowledge boundary](docs/information-flow.md)
-7. [Workflow catalog](docs/workflows.md)
-8. [Candidate interaction traces](docs/interaction-traces.md)
-9. [Trace-derived behavior model](docs/behavior-model.md)
-10. [Simulation status and next review](docs/simulation-plan.md)
-11. [Research basis](docs/research-basis.md)
+1. [What we are building and why](docs/overview.md)
+2. [Verbatim origin conversation](source/origin-conversation-verbatim.md), its [provenance](source/provenance.md), and the [checksum manifest](source/SHA256SUMS)
+3. [Accepted synthesis, intent, and corrections](docs/intent-and-corrections.md)
+4. [Knowledge structure: accepted core and candidate implications](docs/knowledge-structure.md)
+5. [Goals and working requirements](docs/goals-and-requirements.md)
+
+## Design-spike evidence
+
+These are probes and durable design-spike evidence, not the identity of the project:
+
+1. [Information-flow probe across the semantic boundary](docs/information-flow.md)
+2. [Workflow catalog](docs/workflows.md)
+3. [Candidate interaction traces](docs/interaction-traces.md)
+4. [Simulation status and next review](docs/simulation-plan.md)
+5. [Candidate behavior vocabulary](docs/behavior-model.md)
+6. [Research basis](docs/research-basis.md)
 
 ## Current phase
 
-- The source conversation is captured verbatim through the latest workflow correction and checksummed in the [manifest](source/SHA256SUMS).
-- [User intent and corrections](docs/intent-and-corrections.md) are separated from assistant proposals and rejected directions.
-- The [knowledge-structure document](docs/knowledge-structure.md) makes reusable pieces, sparse shape, organization, provenance, history, and retrieval paths the project's center rather than treating N5 scenarios as the product.
-- Nine [workflow stories](docs/workflows.md) name the behaviors to investigate; the [interaction traces](docs/interaction-traces.md) now expose the information carried across every boundary and the hidden prerequisites for each intermediate step.
-- The [information-flow model](docs/information-flow.md) separates semantic work a bounded model can perform from retrieval, persistence, and protocol behavior that tools must supply.
-- Eighteen [schema-blind fixtures](simulations/README.md) replay the nine primary flows and their first pressure variations; they currently dataflow-check 97 declared steps without selecting a production schema.
-- Candidate states and lifecycles remain provisional.
-- No database, ontology, graph model, API, framework, or permanent component name has been selected.
+- The complete 98-entry conversation is preserved verbatim and checksummed in the [manifest](source/SHA256SUMS).
+- [The overview](docs/overview.md) now states the transcript-grounded product thesis and why each part of the boundary exists.
+- Nine workflow stories and 18 fixtures are candidate design probes. Their 97 declared steps are dataflow-checked, not proof of semantic intelligence or accepted product behavior.
+- Automatic organization, semantic writeback, correction, conflict handling, and contextual retrieval remain the central unproven capabilities.
+- No database, graph model, ontology, runtime API, permanent component name, or production architecture has been selected.

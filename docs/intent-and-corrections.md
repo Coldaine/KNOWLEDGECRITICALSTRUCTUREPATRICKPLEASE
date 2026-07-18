@@ -2,6 +2,19 @@
 
 The user's statements and corrections define the current intent. Assistant proposals below remain examples or hypotheses unless the user explicitly accepted them. ([T048](../source/origin-conversation-verbatim.md#t048---user), [T061](../source/origin-conversation-verbatim.md#t061---user))
 
+## Accepted synthesis
+
+The decisive product model was reached in [T055–T061](../source/origin-conversation-verbatim.md#t055---user). T057 and T059 confirm the topology and rationale developed in T056 and T058. T061 retains the bounded multi-step translation idea from T060 while correcting its retrieval-biased name and rejecting premature mechanics:
+
+- Broad outside agents remain focused on world-facing work and do not learn the knowledge store's graph, schema, organization, or mutation mechanics.
+- One short-lived semantic translation layer conceptually lives inside the knowledge-service boundary and is the normal knowledge interface for outside agents.
+- It operates with clean context, remains stateless between interactions, and has only knowledge-transfer and knowledge-manipulation tools.
+- It mediates both ingress and egress. Its write-side role includes interpreting, encoding, storing, and organizing knowledge rather than only retrieving it.
+- Its narrow context and capabilities make a small, fast model plausible and create one place for stronger knowledge-side enforcement.
+- “Translation layer” describes its role. It is agentic only when a bounded translation requires several reasoning and tool steps; it does not pursue an open-ended mission.
+
+T060's proposed transaction, validation, and enforcement details were not accepted. The exact database, tools, transaction behavior, states, and enforcement mechanics remain hypotheses; the product boundary above does not.
+
 ## What prompted the work
 
 - N5 storage knowledge did not fit cleanly into a host-specific architecture document. The user expected a general storage context cross-linked to N5 and questioned whether the documentation guide itself had become restrictive. ([T032](../source/origin-conversation-verbatim.md#t032---user), [T038](../source/origin-conversation-verbatim.md#t038---user))

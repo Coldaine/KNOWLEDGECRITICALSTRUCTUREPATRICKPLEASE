@@ -1,6 +1,6 @@
-# Trace-derived behavior model
+# Downstream scratch: trace-derived behavior model
 
-This document records only behavior repeated or exposed by the [candidate interaction traces](interaction-traces.md). It does not define an architecture, API, universal record, or accepted state machine.
+This document is downstream scratch derived from assistant-authored [candidate interaction traces](interaction-traces.md). Those traces are not yet user-accepted golden behavior. Nothing here defines the product, an architecture, an API, a universal record, or an accepted state machine.
 
 The earlier version proposed one broad `receive → scope → resolve → inspect → interpret → plan → validate → apply → project` sequence before the information dependencies were explicit. The user challenged exactly that gap in [T096](../source/origin-conversation-verbatim.md#t096---user). The traces showed that this was too smooth: reads, writes, retries, conflicts, and interrupted effects have different proof obligations and cannot honestly share one simple lifecycle.
 

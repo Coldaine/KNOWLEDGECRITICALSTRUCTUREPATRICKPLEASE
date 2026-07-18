@@ -1,5 +1,7 @@
 # Simulation status and next review
 
+This is supporting design-spike evidence. The product is the semantic knowledge boundary described in the [overview](overview.md); the simulations exist only to expose whether that boundary can actually perform the required work.
+
 ## Purpose
 
 The simulations make each intermediate dependency visible before any architecture is selected. They test whether the outside caller, short-lived translation layer, and durable side have the information needed for every step. They do not pretend that replaying a trace proves model quality or database behavior. ([T061](../source/origin-conversation-verbatim.md#t061---user))

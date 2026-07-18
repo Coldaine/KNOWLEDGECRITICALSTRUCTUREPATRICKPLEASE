@@ -1,5 +1,7 @@
 # Goals and Working Requirements
 
+The product goals are the center of this document. The later design-spike method exists to test that direction without prematurely defining the product.
+
 ## Goals
 
 - **Make the intent durable.** Preserve the complete conversation and convert it into concise Markdown that can be reviewed after the original context is gone. ([T061](../source/origin-conversation-verbatim.md#t061---user), [T063](../source/origin-conversation-verbatim.md#t063---user), [T069](../source/origin-conversation-verbatim.md#t069---user))
@@ -9,7 +11,7 @@
 - **Cover the entire knowledge lifecycle.** The internal role includes encoding, organizing, storing, correcting, and retrieving—not only search. ([T061](../source/origin-conversation-verbatim.md#t061---user))
 - **Discover the behavior before designing the software.** Scenarios and simulations establish what the system needs to do before components, states, or code are committed. ([T061](../source/origin-conversation-verbatim.md#t061---user), [T063](../source/origin-conversation-verbatim.md#t063---user))
 
-## Requirements for the design spike
+## Supporting design-spike method
 
 - **Source:** Keep the verbatim conversation as the primary evidence; cite its `T###` anchors from every derived document. ([T061](../source/origin-conversation-verbatim.md#t061---user), [T069](../source/origin-conversation-verbatim.md#t069---user))
 - **Derivation:** Separate user intent and corrections from assistant suggestions so an example does not silently become a decision. ([T048](../source/origin-conversation-verbatim.md#t048---user), [T061](../source/origin-conversation-verbatim.md#t061---user))

@@ -1,14 +1,14 @@
-# Knowledge structure under test
+# Knowledge structure: accepted core and candidate implications
 
-## Core proposition
+## Accepted core
 
-Durable knowledge is made of addressable, reusable pieces and relationships, not facts owned by one document. The same piece can be discovered from N5, storage, a migration, or inference planning without four maintained copies. ([T043](../source/origin-conversation-verbatim.md#t043---user), [T046](../source/origin-conversation-verbatim.md#t046---user))
+Durable knowledge is made of addressable, reusable pieces and relationships, not facts owned by one document. The same piece can be discovered from N5, storage, a migration, or inference planning without four maintained copies. Pieces can have different shapes, metadata need not appear in normal context, and outside agents interact through the internal semantic boundary rather than manipulating the structure directly. ([T043](../source/origin-conversation-verbatim.md#t043---user), [T046](../source/origin-conversation-verbatim.md#t046---user), [T055](../source/origin-conversation-verbatim.md#t055---user))
 
-This is not yet a schema. The design spike is discovering what the structure must preserve and make retrievable before deciding how it is stored.
+That is accepted product intent. The useful granularity, storage representation, and detailed distinctions below remain to be discovered.
 
-## What the durable side needs to keep distinct
+## Candidate distinctions to test
 
-The conversation and first traces repeatedly require four different concerns. They may later be represented in many ways.
+The N5 discussion and current assistant-authored traces suggest four concerns that may need to remain distinguishable. They are hypotheses to pressure-test, not a selected schema or user-accepted decomposition.
 
 ### 1. Source material
 
@@ -60,7 +60,7 @@ The durable system may maintain revision, indexing, or operational metadata inte
 
 Sparse does not mean unfindable. The store and its indexes collectively need to answer the questions the workflows actually ask.
 
-## Retrieval paths the behavior requires
+## Candidate retrieval paths exposed by the probes
 
 - **Identity and aliases:** What does `N5`, `tank`, `zfs_arc_max`, or `fourth disk` refer to in this scope?
 - **Context and relationships:** What knowledge matters to this host, domain, operation, decision, or task?
@@ -70,13 +70,17 @@ Sparse does not mean unfindable. The store and its indexes collectively need to 
 - **History and correction:** What changed, what did it replace or qualify, and why did the earlier reading exist?
 - **Operation and outcome:** What was proposed, what became durable, and what remains indeterminate?
 
-The store must also report whether a bounded retrieval was complete for its declared scope, truncated, inaccessible, or not attempted. Otherwise an unreturned piece cannot safely be treated as nonexistent.
+The current safety-oriented probes suggest that some bounded retrievals may also need to distinguish complete, truncated, inaccessible, and unattempted scopes. Whether that belongs in the general contract remains open.
 
 These paths are behavioral needs, not a choice of graph, relational database, search engine, or ontology.
 
-## The management boundary
+## Accepted management boundary
 
 Outside work agents should not construct these pieces or relationships directly. They report what they observed, decided, corrected, or need in ordinary task language. ([T055](../source/origin-conversation-verbatim.md#t055---user), [T057](../source/origin-conversation-verbatim.md#t057---user))
+
+The internal translation layer operates with clean context, remains stateless between interactions, uses only knowledge-side tools, and mediates both the write and read sides. Its write-side responsibility includes interpreting, encoding, storing, and organizing knowledge rather than only retrieving it. ([T055](../source/origin-conversation-verbatim.md#t055---user), [T057](../source/origin-conversation-verbatim.md#t057---user), [T059](../source/origin-conversation-verbatim.md#t059---user), [T061](../source/origin-conversation-verbatim.md#t061---user))
+
+## Candidate internal capabilities exposed by the probes
 
 The short-lived internal translation layer:
 
@@ -88,9 +92,9 @@ The short-lived internal translation layer:
 - Returns useful language, source pointers, ambiguity, or next evidence.
 - Ends without conversational memory.
 
-The layer is not merely a retrieval agent. Its distinctive responsibility includes encoding, storing, organizing, correcting, and carrying meaning across the durable boundary in both directions. ([T059](../source/origin-conversation-verbatim.md#t059---user), [T061](../source/origin-conversation-verbatim.md#t061---user))
+The layer is not merely a retrieval agent. Its distinctive responsibility includes encoding, storing, organizing, and carrying meaning across the durable boundary in both directions. ([T059](../source/origin-conversation-verbatim.md#t059---user), [T061](../source/origin-conversation-verbatim.md#t061---user))
 
-## Canonical example of why the distinctions matter
+## Motivating example of why the distinctions matter
 
 ```text
 Source: authenticated output contains zfs_arc_max=2147483648.
@@ -103,7 +107,7 @@ Organization: the observation matters to N5, storage behavior, and inference-res
 
 Flattening those into one `ARC = 2 GiB` fact reproduces the exact failure that prompted this design. ([T040](../source/origin-conversation-verbatim.md#t040---user), [T042](../source/origin-conversation-verbatim.md#t042---assistant))
 
-## Default reading behavior
+## Candidate default reading behavior
 
 - Return ordinary task-relevant language rather than raw front matter.
 - Include stable operational identifiers, time, standing, uncertainty, and sources when they change the task answer.
