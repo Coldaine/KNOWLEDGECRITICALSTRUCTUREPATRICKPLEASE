@@ -367,12 +367,62 @@ Not established. The stored material shows that a verification read ran, but it 
 
 **Candidate states exposed:** received → identity unique or ambiguous → task state loaded → evidence chain complete, conflicted, or gapped → supported or not established → returned.
 
+## Trace 9: discover organization without an outside link plan
+
+**Question under test:** Can ordinary evidence become usefully organized when the outside agent supplies no context list or relationship syntax?
+
+**Starting durable state**
+
+- N5 and `tank` can be resolved from source and name.
+- Storage, the active migration, and inference-resource planning are discoverable contexts with existing paths explaining why `tank` may matter to them.
+- The new observation and source are absent.
+
+**Left input**
+
+```text
+Intent: record an observation
+Evidence: authenticated N5 output describes tank as three-wide RAIDZ1
+Source: command/session locator and observation time
+Task context: diagnosing N5 storage
+No requested contexts, links, relation types, or store identifiers
+```
+
+| # | Direction | Information and reasoning | Durable effect |
+| --- | --- | --- | --- |
+| 1 | L→T | Send ordinary evidence, its source/time, record intent, and minimal task context. | None |
+| 2 | T | Separate source, observation, subject mentions, and task context. Do not manufacture a context list. | None |
+| 3 | T→R | Resolve N5 and `tank`; look for a duplicate or earlier version; return candidate contexts and relationship paths that make this meaning discoverable. | None |
+| 4 | R→T | Return unique or ambiguous subjects, an explicit duplicate-match result, related pieces, context candidates, path/basis, current standing, and search coverage. | None |
+| 5 | T | Compare the bounded candidates. Treat direct subject associations separately from broader contextual relationships. Keep weakly supported candidates provisional. | None |
+| 6 | T→R | Propose separate effects: retain source, record observation, associate direct subjects, add supported discovery paths, and retain weaker contextual suggestions with their basis and provisional standing. | None until evaluated |
+| 7 | R→T | Return accepted, unchanged, provisional, rejected, or indeterminate status and a resulting reference for every content and organization effect. | Only effects explicitly reported |
+| 8 | T→L | Report what was recorded, accepted discovery paths, provisional suggestions, rejected ambiguity, and the next distinction needed. | None |
+
+**Expected ending state**
+
+- The duplicate search explicitly found no existing observation, so one source and observation are created; the content is not copied for each context.
+- N5 and `tank` are direct discovery paths.
+- A storage path is accepted only when the returned basis supports it.
+- Migration and inference-planning paths may remain provisional when their relevance is inferred rather than supplied or directly evidenced.
+- Every relationship retains its own basis and outcome.
+
+**Feasibility ledger**
+
+- A small model can extract the observation, select among bounded subject/context candidates, compare returned path explanations, and propose different relationship standing.
+- Tools must supply candidate discovery, an explicit duplicate-match result, endpoint identity, existing paths, relationship basis, coverage, and per-effect outcomes.
+- The model cannot discover contexts that retrieval never exposes or prove that the returned candidate neighborhood is globally complete.
+
+**Pressure variation:** If `tank` resolves to several pools, no observation or accepted relationship is attached by guesswork. The response returns the candidates and says whether the raw source was retained. Source retention without resolved interpretation remains an open behavior choice.
+
+**Candidate states exposed:** evidence received → subjects unique or ambiguous → candidate neighborhood loaded → direct and inferred organization separated → per-effect outcomes returned.
+
 ## Cross-trace findings
 
 - The model is useful for semantic decomposition, bounded comparison, candidate selection, and explanation.
 - Identity, source binding, currentness, retrieval coverage, authority, persistence, retries, and failure recovery cannot be supplied by semantic confidence.
 - Reads and writes use the same translation boundary, but their proof obligations differ.
 - The write side is the less established part: it must preserve source, interpretation, organization, history, and exact effects without asking the outside agent to shape records.
+- Automatic organization requires the durable side to return candidate contexts and relationship paths; asking the outside agent to name every link does not test it.
 - Retrieval is easy only when the durable side supports several paths and reports the limits of every result.
 - The traces expose several candidate lifecycles; they do not yet prove one universal state machine.
 

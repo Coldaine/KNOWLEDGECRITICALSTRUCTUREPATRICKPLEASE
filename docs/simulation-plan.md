@@ -6,10 +6,10 @@ The simulations make each intermediate dependency visible before any architectur
 
 ## First pass completed
 
-- The eight [workflow stories](workflows.md) have been expanded into [candidate interaction traces](interaction-traces.md).
+- The nine [workflow stories](workflows.md) have been expanded into [candidate interaction traces](interaction-traces.md).
 - Every trace records starting durable knowledge, exact left input, left/right transfers, internal semantic judgments, durable effects, returned results, feasibility limits, and a pressure variation.
 - Each primary flow and first pressure variation has a separate schema-blind fixture under [`simulations/fixtures`](../simulations/fixtures).
-- The dependency-free [replay tool](../tools/run_simulations.py) currently validates 16 fixtures and 86 explicit steps.
+- The dependency-free [replay tool](../tools/run_simulations.py) currently dataflow-checks 18 candidate fixtures and 97 declared steps.
 - These traces are implemented, but they are not yet human-accepted golden behavior.
 
 Run the current simulations:
@@ -32,21 +32,24 @@ Use `--verbose` to inspect every boundary crossing.
 | Link and reorganize | `06-link-normal` | `06-link-ambiguous-context` | The model can propose discovery paths; endpoints and durable outcomes must come from tools |
 | Handle partial effects | `07-invalid-target-no-effects` | `07-interrupted-partial-outcome` | Generic success/failure is insufficient; every effect and unknown outcome must be observable |
 | Answer erase safety | `08-erase-not-established` | `08-erase-supported-no-action` | The model can follow a stored evidence chain; missing retained success cannot be inferred from elapsed activity |
+| Discover organization | `09-auto-organize-normal` | `09-auto-organize-ambiguous-subject` | The caller can submit ordinary evidence; the layer can propose organization only after the durable side supplies resolvable subjects, candidate contexts, and retrieval-path limits |
 
 ## What the replay tool checks
 
 - Every step names the actor performing it.
-- Every required information token is already held by that actor or available to the durable side.
+- Every declared required information token is already held by that actor or available to the durable side.
 - Information can cross only L→T, T→R, R→T, or T→L; the outside caller cannot bypass the translation layer.
 - A participant cannot send information it never received or derived.
 - Only the durable side can add or remove durable tokens.
 - Expected returned, durable, and forbidden tokens match the candidate trace.
+- Every durable addition/removal event and the one terminal layer-to-outside response match the fixture oracle.
 
 The fixture items are deliberately opaque. The runner has no entity model, claim schema, relation vocabulary, database query, API, or universal lifecycle.
 
 ## What remains unproven
 
 - Whether a real model makes each semantic distinction reliably.
+- Whether each fixture author identified every real semantic dependency.
 - Whether real retrieval finds the required material with useful latency and coverage.
 - Whether the candidate knowledge organization generalizes outside these N5-grounded examples.
 - The correct source-retention behavior when interpretation fails.

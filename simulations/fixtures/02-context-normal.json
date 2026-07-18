@@ -100,6 +100,8 @@
   "expected": {
     "has": {"outside": ["response.context-capsule"]},
     "not_has": {"durable": ["durable.canonical-capsule"]},
+    "durable_added": [],
+    "durable_removed": [],
     "response": "response.context-capsule"
   }
 }

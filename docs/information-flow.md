@@ -33,9 +33,9 @@ These are scenario-derived contents, not one mandatory record shape. A request c
 
 | Direction | Information that may need to cross |
 | --- | --- |
-| **L→T** | Plain-language intent or question; raw evidence or a durable locator; source and observation time when relevant; explicit qualifications; target hints; task scope; as-of time; desired response; risk and context limits when the request needs them |
-| **T→R** | Identity candidates to resolve; a bounded retrieval question; requested time or task scope; a provenance drill-down; or proposed semantic effects that reference the material used to derive them |
-| **R→T** | Candidate identities and match basis; exact stored content; source and time; current, historical, conflicting, or uncertain standing; relationship paths; query limits; validation failures; and per-effect write outcomes |
+| **L→T** | Plain-language intent or question; raw evidence or a durable locator; source and observation time when relevant; explicit qualifications; target hints; task scope; as-of time; desired response; risk and context limits when the request needs them. A retry also carries the prior request identity and repeated content needed for exact binding. |
+| **T→R** | Identity candidates to resolve; a bounded retrieval question; requested time or task scope; a provenance drill-down; or proposed semantic effects that reference the material used to derive them. Retry and reconciliation requests also carry the operation reference, exact content binding, affected references, and the target version or current state used by the proposal. |
+| **R→T** | Candidate identities and match basis; exact stored content; source and time; current, historical, conflicting, or uncertain standing; relationship paths; query limits; validation failures; and per-effect write outcomes. Retry and reconciliation results also identify the prior operation, content match or mismatch, inspected target state, and each applied, absent, or indeterminate effect. |
 | **T→L** | Answer or change result; what was and was not established; exact accepted, rejected, unchanged, or indeterminate effects; useful source pointers; ambiguity; and the next evidence needed |
 
 Normal reads should not dump all metadata. The right side must still expose enough metadata for the translation layer to judge the current request.
@@ -102,6 +102,7 @@ Without that distinction, the translation layer can say only “not present in t
 | Link and reorganize | Conditionally | Stable endpoints, relationship standing, and validation of durable link effects |
 | Handle partial mutation | Not with the current contract | Preview/effect planning, journaling, failure observation, and reconciliation behavior |
 | Assemble an erase-safety answer | Conditionally | Complete identity, current topology, explicit preconditions, verification semantics, and source-level results |
+| Discover organization from ordinary evidence | Conditionally | Subject resolution, duplicate candidates, available contexts, retrieval-path coverage, and per-link persistence outcomes |
 
 The answer is therefore not “the agent can resolve it.” The answer is: the model can make bounded semantic judgments after the tools supply the identities, evidence, history, limits, and observable outcomes required for that judgment.
 

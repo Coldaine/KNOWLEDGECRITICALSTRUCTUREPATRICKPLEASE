@@ -20,11 +20,11 @@ This is not a software architecture yet. It preserves the source, states the int
 
 ## Current phase
 
-- The source conversation is captured verbatim through the latest workflow correction and checksummed in the [manifest](source/SHA256SUMS). ([T096](source/origin-conversation-verbatim.md#t096---user), [T098](source/origin-conversation-verbatim.md#t098---user))
-- User intent is separated from assistant proposals and rejected directions. ([T061](source/origin-conversation-verbatim.md#t061---user), [T063](source/origin-conversation-verbatim.md#t063---user))
+- The source conversation is captured verbatim through the latest workflow correction and checksummed in the [manifest](source/SHA256SUMS).
+- [User intent and corrections](docs/intent-and-corrections.md) are separated from assistant proposals and rejected directions.
 - The [knowledge-structure document](docs/knowledge-structure.md) makes reusable pieces, sparse shape, organization, provenance, history, and retrieval paths the project's center rather than treating N5 scenarios as the product.
-- Eight [workflow stories](docs/workflows.md) name the behaviors to investigate; the [interaction traces](docs/interaction-traces.md) now expose the information carried across every boundary and the hidden prerequisites for each intermediate step.
+- Nine [workflow stories](docs/workflows.md) name the behaviors to investigate; the [interaction traces](docs/interaction-traces.md) now expose the information carried across every boundary and the hidden prerequisites for each intermediate step.
 - The [information-flow model](docs/information-flow.md) separates semantic work a bounded model can perform from retrieval, persistence, and protocol behavior that tools must supply.
-- Sixteen [schema-blind fixtures](simulations/README.md) replay the eight primary flows and their first pressure variations; they currently validate 86 explicit steps without selecting a production schema.
-- Candidate states and lifecycles remain provisional. ([T061](source/origin-conversation-verbatim.md#t061---user))
-- No database, ontology, graph model, API, framework, or permanent component name has been selected. ([T061](source/origin-conversation-verbatim.md#t061---user), [T063](source/origin-conversation-verbatim.md#t063---user))
+- Eighteen [schema-blind fixtures](simulations/README.md) replay the nine primary flows and their first pressure variations; they currently dataflow-check 97 declared steps without selecting a production schema.
+- Candidate states and lifecycles remain provisional.
+- No database, ontology, graph model, API, framework, or permanent component name has been selected.

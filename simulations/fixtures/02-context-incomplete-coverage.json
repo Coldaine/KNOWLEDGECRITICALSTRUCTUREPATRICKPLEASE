@@ -66,6 +66,8 @@
   "expected": {
     "has": {"outside": ["response.context-incomplete"]},
     "not_has": {"outside": ["response.confident-safe-context"], "durable": ["durable.canonical-capsule"]},
+    "durable_added": [],
+    "durable_removed": [],
     "response": "response.context-incomplete"
   }
 }

@@ -14,7 +14,7 @@ The traces consistently preserve this responsibility split from [T055–T061](..
 
 One invocation may contain several right-side exchanges. The model is stateless between invocations; the durable side is the only continuity assumed.
 
-## Repeated behavior actually observed
+## Repeated behavior across the candidate traces
 
 Not every trace uses every behavior.
 
@@ -76,7 +76,18 @@ Time and currentness remain attached to the returned material. `absent + complet
 proposed → accepted | rejected | unchanged | indeterminate
 ```
 
-A multi-effect request can produce a different outcome for each effect unless a future durable contract establishes all-or-nothing behavior. Source retention is reported separately from accepted interpretation.
+This lifecycle applies to one effect. A multi-effect request can produce a different outcome for each effect unless a future durable contract establishes all-or-nothing behavior. Source retention is reported separately from accepted interpretation.
+
+The invocation also needs an aggregate report derived from its per-effect outcomes:
+
+```text
+complete                 every effect has a known accepted or unchanged outcome
+rejected                 no requested semantic effect was accepted
+partial                  known outcomes are mixed; at least one effect applied and another did not
+reconciliation required  one or more effect outcomes remain indeterminate
+```
+
+These are candidate response distinctions exposed by the partial-effect traces, not selected transaction states. The aggregate never replaces the per-effect results.
 
 ### Knowledge standing
 

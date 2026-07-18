@@ -1,0 +1,288 @@
+{
+  "id": "09-auto-organize-normal",
+  "title": "Discover supported organization from ordinary N5 evidence",
+  "basis": ["T043-T048", "T055-T061", "T096-T098", "interaction-trace-9"],
+  "feasibility": "conditional",
+  "items": {
+    "request.record-observation": "The caller asks to record one ordinary observation",
+    "evidence.tank-geometry": "Authenticated N5 output describes tank as three-wide RAIDZ1",
+    "evidence.source-time": "The output is bound to a source and observation time",
+    "task.diagnose-n5-storage": "The outside task is diagnosing N5 storage",
+    "rule.inferred-links-stay-provisional": "Contextual links inferred from a candidate neighborhood are not silently accepted as direct evidence",
+    "meaning.tank-geometry-observation": "The layer interprets one sourced tank geometry observation",
+    "query.subjects-duplicates-contexts": "A request to resolve subjects, find possible duplicates, and return candidate contexts with path basis",
+    "store.entity.n5": "The unique N5 identity",
+    "store.entity.tank": "The unique tank identity",
+    "store.context.storage": "The storage-domain context",
+    "store.context.migration": "The active migration context",
+    "store.context.inference": "The inference-resource planning context",
+    "store.path.tank-is-storage": "A stored path directly placing tank in the storage context",
+    "store.path.migration-concerns-tank": "A stored path making migration a candidate context for tank",
+    "store.path.inference-concerns-tank": "A stored path making inference planning a candidate context for tank",
+    "coverage.candidate-neighborhood-complete": "The requested subject, duplicate, and context search completed without truncation",
+    "match.no-existing-observation": "The duplicate search found no existing observation matching this sourced content",
+    "meaning.direct-versus-inferred-organization": "The layer separates direct subject/storage paths from broader inferred contexts",
+    "proposal.retain-source": "Proposed source-retention effect",
+    "proposal.record-observation": "Proposed observation effect",
+    "proposal.link-n5": "Proposed direct N5 discovery path",
+    "proposal.link-tank": "Proposed direct tank discovery path",
+    "proposal.link-storage": "Proposed supported storage discovery path",
+    "proposal.suggest-migration": "Proposed provisional migration discovery path with its basis",
+    "proposal.suggest-inference": "Proposed provisional inference-planning path with its basis",
+    "result.source-retained": "Source retention was accepted with a resulting reference",
+    "result.observation-applied": "The observation was accepted with a resulting reference",
+    "result.n5-link-applied": "The N5 path was accepted with a resulting reference",
+    "result.tank-link-applied": "The tank path was accepted with a resulting reference",
+    "result.storage-link-applied": "The storage path was accepted with a resulting reference",
+    "result.migration-link-provisional": "The migration path was retained as provisional with a resulting reference",
+    "result.inference-link-provisional": "The inference-planning path was retained as provisional with a resulting reference",
+    "durable.source.tank-geometry": "Retained source for the geometry observation",
+    "durable.observation.tank-geometry": "One durable geometry observation",
+    "durable.link.n5": "Direct N5 discovery path",
+    "durable.link.tank": "Direct tank discovery path",
+    "durable.link.storage": "Supported storage discovery path",
+    "durable.suggestion.migration": "Provisional migration discovery path with basis",
+    "durable.suggestion.inference": "Provisional inference-planning path with basis",
+    "durable.duplicate.tank-geometry": "A copied second version of the observation content",
+    "response.auto-organized": "The caller receives recorded content, accepted paths, provisional suggestions, and their outcomes"
+  },
+  "initial": {
+    "outside": ["request.record-observation", "evidence.tank-geometry", "evidence.source-time", "task.diagnose-n5-storage"],
+    "layer": ["rule.inferred-links-stay-provisional"],
+    "store": [],
+    "durable": [
+      "store.entity.n5",
+      "store.entity.tank",
+      "store.context.storage",
+      "store.context.migration",
+      "store.context.inference",
+      "store.path.tank-is-storage",
+      "store.path.migration-concerns-tank",
+      "store.path.inference-concerns-tank"
+    ]
+  },
+  "steps": [
+    {
+      "id": "submit-ordinary-evidence",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send ordinary evidence, source, and task context without naming links or contexts",
+      "requires": ["request.record-observation", "evidence.tank-geometry", "evidence.source-time", "task.diagnose-n5-storage"],
+      "send": [{"to": "layer", "items": ["request.record-observation", "evidence.tank-geometry", "evidence.source-time", "task.diagnose-n5-storage"]}]
+    },
+    {
+      "id": "interpret-observation",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Extract one observation and subject mentions without manufacturing a context list",
+      "requires": ["request.record-observation", "evidence.tank-geometry", "evidence.source-time"],
+      "derive": ["meaning.tank-geometry-observation"]
+    },
+    {
+      "id": "request-candidate-organization",
+      "actor": "layer",
+      "mode": "lookup",
+      "note": "Ask for subjects, possible duplicates, and candidate contexts with relationship basis",
+      "requires": ["meaning.tank-geometry-observation", "task.diagnose-n5-storage"],
+      "derive": ["query.subjects-duplicates-contexts"],
+      "send": [{"to": "store", "items": ["query.subjects-duplicates-contexts", "meaning.tank-geometry-observation", "task.diagnose-n5-storage"]}]
+    },
+    {
+      "id": "return-candidate-organization",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return unique subjects, candidate contexts, each path basis, and search coverage",
+      "requires": [
+        "query.subjects-duplicates-contexts",
+        "store.entity.n5",
+        "store.entity.tank",
+        "store.context.storage",
+        "store.context.migration",
+        "store.context.inference",
+        "store.path.tank-is-storage",
+        "store.path.migration-concerns-tank",
+        "store.path.inference-concerns-tank"
+      ],
+      "derive": ["coverage.candidate-neighborhood-complete", "match.no-existing-observation"],
+      "send": [{
+        "to": "layer",
+        "items": [
+          "store.entity.n5",
+          "store.entity.tank",
+          "store.context.storage",
+          "store.context.migration",
+          "store.context.inference",
+          "store.path.tank-is-storage",
+          "store.path.migration-concerns-tank",
+          "store.path.inference-concerns-tank",
+          "coverage.candidate-neighborhood-complete",
+          "match.no-existing-observation"
+        ]
+      }]
+    },
+    {
+      "id": "propose-content-and-organization",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Propose direct discovery paths separately from provisional inferred contexts",
+      "requires": [
+        "evidence.tank-geometry",
+        "evidence.source-time",
+        "meaning.tank-geometry-observation",
+        "store.entity.n5",
+        "store.entity.tank",
+        "store.context.storage",
+        "store.context.migration",
+        "store.context.inference",
+        "store.path.tank-is-storage",
+        "store.path.migration-concerns-tank",
+        "store.path.inference-concerns-tank",
+        "coverage.candidate-neighborhood-complete",
+        "match.no-existing-observation",
+        "rule.inferred-links-stay-provisional"
+      ],
+      "derive": [
+        "meaning.direct-versus-inferred-organization",
+        "proposal.retain-source",
+        "proposal.record-observation",
+        "proposal.link-n5",
+        "proposal.link-tank",
+        "proposal.link-storage",
+        "proposal.suggest-migration",
+        "proposal.suggest-inference"
+      ],
+      "send": [{
+        "to": "store",
+        "items": [
+          "evidence.tank-geometry",
+          "evidence.source-time",
+          "meaning.tank-geometry-observation",
+          "meaning.direct-versus-inferred-organization",
+          "store.entity.n5",
+          "store.entity.tank",
+          "store.context.storage",
+          "store.context.migration",
+          "store.context.inference",
+          "store.path.tank-is-storage",
+          "store.path.migration-concerns-tank",
+          "store.path.inference-concerns-tank",
+          "coverage.candidate-neighborhood-complete",
+          "match.no-existing-observation",
+          "proposal.retain-source",
+          "proposal.record-observation",
+          "proposal.link-n5",
+          "proposal.link-tank",
+          "proposal.link-storage",
+          "proposal.suggest-migration",
+          "proposal.suggest-inference"
+        ]
+      }]
+    },
+    {
+      "id": "apply-content-and-organization",
+      "actor": "store",
+      "mode": "enforcement",
+      "note": "Evaluate every content and relationship effect with separate outcome standing",
+      "requires": [
+        "evidence.tank-geometry",
+        "evidence.source-time",
+        "meaning.tank-geometry-observation",
+        "meaning.direct-versus-inferred-organization",
+        "store.entity.n5",
+        "store.entity.tank",
+        "store.context.storage",
+        "store.context.migration",
+        "store.context.inference",
+        "coverage.candidate-neighborhood-complete",
+        "match.no-existing-observation",
+        "proposal.retain-source",
+        "proposal.record-observation",
+        "proposal.link-n5",
+        "proposal.link-tank",
+        "proposal.link-storage",
+        "proposal.suggest-migration",
+        "proposal.suggest-inference"
+      ],
+      "derive": [
+        "result.source-retained",
+        "result.observation-applied",
+        "result.n5-link-applied",
+        "result.tank-link-applied",
+        "result.storage-link-applied",
+        "result.migration-link-provisional",
+        "result.inference-link-provisional",
+        "durable.source.tank-geometry",
+        "durable.observation.tank-geometry",
+        "durable.link.n5",
+        "durable.link.tank",
+        "durable.link.storage",
+        "durable.suggestion.migration",
+        "durable.suggestion.inference"
+      ],
+      "persist": [
+        "durable.source.tank-geometry",
+        "durable.observation.tank-geometry",
+        "durable.link.n5",
+        "durable.link.tank",
+        "durable.link.storage",
+        "durable.suggestion.migration",
+        "durable.suggestion.inference"
+      ],
+      "send": [{
+        "to": "layer",
+        "items": [
+          "result.source-retained",
+          "result.observation-applied",
+          "result.n5-link-applied",
+          "result.tank-link-applied",
+          "result.storage-link-applied",
+          "result.migration-link-provisional",
+          "result.inference-link-provisional"
+        ]
+      }]
+    },
+    {
+      "id": "return-organization-result",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Return recorded content, direct discovery paths, provisional suggestions, and their outcomes",
+      "requires": [
+        "result.source-retained",
+        "result.observation-applied",
+        "result.n5-link-applied",
+        "result.tank-link-applied",
+        "result.storage-link-applied",
+        "result.migration-link-provisional",
+        "result.inference-link-provisional"
+      ],
+      "derive": ["response.auto-organized"],
+      "send": [{"to": "outside", "items": ["response.auto-organized"]}]
+    }
+  ],
+  "expected": {
+    "has": {
+      "outside": ["response.auto-organized"],
+      "durable": [
+        "durable.source.tank-geometry",
+        "durable.observation.tank-geometry",
+        "durable.link.n5",
+        "durable.link.tank",
+        "durable.link.storage",
+        "durable.suggestion.migration",
+        "durable.suggestion.inference"
+      ]
+    },
+    "not_has": {"durable": ["durable.duplicate.tank-geometry"]},
+    "durable_added": [
+      "durable.source.tank-geometry",
+      "durable.observation.tank-geometry",
+      "durable.link.n5",
+      "durable.link.tank",
+      "durable.link.storage",
+      "durable.suggestion.migration",
+      "durable.suggestion.inference"
+    ],
+    "durable_removed": [],
+    "response": "response.auto-organized"
+  }
+}

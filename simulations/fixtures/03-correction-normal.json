@@ -69,7 +69,16 @@
       "actor": "store",
       "mode": "enforcement",
       "note": "Apply the correction without deleting the earlier source or interpretation",
-      "requires": ["proposal.qualify-target", "coverage.target-unique-current", "standing.explicit-human-correction"],
+      "requires": [
+        "proposal.qualify-target",
+        "correction.config-not-requirement",
+        "store.observation.arc-2g",
+        "store.claim.old-mistaken-reading",
+        "store.source.old-reading",
+        "coverage.target-unique-current",
+        "standing.explicit-human-correction",
+        "meaning.qualification"
+      ],
       "derive": ["result.qualification-applied", "durable.correction.config-not-requirement", "durable.relation.old-reading-qualified", "durable.current-reading.config-not-policy"],
       "persist": ["durable.correction.config-not-requirement", "durable.relation.old-reading-qualified", "durable.current-reading.config-not-policy"],
       "send": [{"to": "layer", "items": ["result.qualification-applied"]}]
@@ -90,6 +99,12 @@
       "durable": ["store.claim.old-mistaken-reading", "store.source.old-reading", "durable.correction.config-not-requirement", "durable.relation.old-reading-qualified", "durable.current-reading.config-not-policy"]
     },
     "not_has": {"durable": ["durable.old-reading-erased"]},
+    "durable_added": [
+      "durable.correction.config-not-requirement",
+      "durable.relation.old-reading-qualified",
+      "durable.current-reading.config-not-policy"
+    ],
+    "durable_removed": [],
     "response": "response.correction-applied"
   }
 }

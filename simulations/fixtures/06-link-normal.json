@@ -20,7 +20,9 @@
     "proposal.link-storage": "Proposed missing storage discovery path",
     "proposal.link-migration": "Proposed missing migration discovery path",
     "proposal.link-inference": "Proposed missing inference discovery path",
-    "result.links-applied": "The durable side reports all missing paths as applied",
+    "result.storage-link-applied": "The storage discovery path was accepted with a resulting reference",
+    "result.migration-link-applied": "The migration discovery path was accepted with a resulting reference",
+    "result.inference-link-applied": "The inference discovery path was accepted with a resulting reference",
     "durable.link.storage": "Durable storage discovery path",
     "durable.link.migration": "Durable migration discovery path",
     "durable.link.inference": "Durable inference discovery path",
@@ -67,24 +69,62 @@
       "note": "Confirm reuse is semantically valid and propose only the three missing paths",
       "requires": ["store.piece.tank-geometry", "store.context.n5", "store.context.storage", "store.context.migration", "store.context.inference", "store.link.existing-n5", "coverage.endpoints-unique", "standing.explicit-human-organization"],
       "derive": ["meaning.same-piece-valid", "proposal.link-storage", "proposal.link-migration", "proposal.link-inference"],
-      "send": [{"to": "store", "items": ["store.piece.tank-geometry", "store.context.storage", "store.context.migration", "store.context.inference", "meaning.same-piece-valid", "proposal.link-storage", "proposal.link-migration", "proposal.link-inference", "standing.explicit-human-organization"]}]
+      "send": [{
+        "to": "store",
+        "items": [
+          "store.piece.tank-geometry",
+          "store.context.storage",
+          "store.context.migration",
+          "store.context.inference",
+          "coverage.endpoints-unique",
+          "meaning.same-piece-valid",
+          "proposal.link-storage",
+          "proposal.link-migration",
+          "proposal.link-inference",
+          "standing.explicit-human-organization"
+        ]
+      }]
     },
     {
       "id": "apply-paths",
       "actor": "store",
       "mode": "enforcement",
       "note": "Add the three discovery paths without copying content",
-      "requires": ["proposal.link-storage", "proposal.link-migration", "proposal.link-inference", "store.piece.tank-geometry", "standing.explicit-human-organization"],
-      "derive": ["result.links-applied", "durable.link.storage", "durable.link.migration", "durable.link.inference"],
+      "requires": [
+        "proposal.link-storage",
+        "proposal.link-migration",
+        "proposal.link-inference",
+        "store.piece.tank-geometry",
+        "store.context.storage",
+        "store.context.migration",
+        "store.context.inference",
+        "coverage.endpoints-unique",
+        "meaning.same-piece-valid",
+        "standing.explicit-human-organization"
+      ],
+      "derive": [
+        "result.storage-link-applied",
+        "result.migration-link-applied",
+        "result.inference-link-applied",
+        "durable.link.storage",
+        "durable.link.migration",
+        "durable.link.inference"
+      ],
       "persist": ["durable.link.storage", "durable.link.migration", "durable.link.inference"],
-      "send": [{"to": "layer", "items": ["result.links-applied"]}]
+      "send": [{"to": "layer", "items": ["result.storage-link-applied", "result.migration-link-applied", "result.inference-link-applied"]}]
     },
     {
       "id": "return-paths",
       "actor": "layer",
       "mode": "response",
       "note": "Return one piece and all four confirmed paths",
-      "requires": ["result.links-applied", "store.piece.tank-geometry", "store.link.existing-n5"],
+      "requires": [
+        "result.storage-link-applied",
+        "result.migration-link-applied",
+        "result.inference-link-applied",
+        "store.piece.tank-geometry",
+        "store.link.existing-n5"
+      ],
       "derive": ["response.one-piece-four-paths"],
       "send": [{"to": "outside", "items": ["response.one-piece-four-paths"]}]
     }
@@ -92,6 +132,8 @@
   "expected": {
     "has": {"outside": ["response.one-piece-four-paths"], "durable": ["store.piece.tank-geometry", "store.link.existing-n5", "durable.link.storage", "durable.link.migration", "durable.link.inference"]},
     "not_has": {"durable": ["durable.duplicate.tank-geometry"]},
+    "durable_added": ["durable.link.storage", "durable.link.migration", "durable.link.inference"],
+    "durable_removed": [],
     "response": "response.one-piece-four-paths"
   }
 }

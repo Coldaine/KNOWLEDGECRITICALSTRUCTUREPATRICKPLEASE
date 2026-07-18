@@ -58,6 +58,8 @@
   "expected": {
     "has": {"outside": ["response.reconciliation-required"]},
     "not_has": {"durable": ["durable.replayed-effect"]},
+    "durable_added": [],
+    "durable_removed": [],
     "response": "response.reconciliation-required"
   }
 }

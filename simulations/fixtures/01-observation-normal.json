@@ -24,7 +24,10 @@
     "proposal.record-observation": "Proposed effect to record the 2 GiB live observation",
     "proposal.preserve-qualification": "Proposed effect to preserve the non-policy qualification",
     "proposal.qualify-old-reading": "Proposed effect to qualify the exact older reading",
-    "result.effects-applied": "The store reports all four supported effects as applied",
+    "result.source-retained": "The source-retention effect was accepted with a resulting reference",
+    "result.observation-applied": "The observation effect was accepted with a resulting reference",
+    "result.qualification-applied": "The non-policy qualification was accepted with a resulting reference",
+    "result.old-reading-qualified": "The exact older-reading qualification was accepted with a resulting reference",
     "durable.source.arc-observation": "Retained source evidence for the submitted observation",
     "durable.observation.arc-2g": "Durable live ARC observation",
     "durable.qualification.not-policy": "Durable distinction that the observation is not policy",
@@ -172,10 +175,18 @@
         "proposal.preserve-qualification",
         "proposal.qualify-old-reading",
         "evidence.arc-raw",
-        "evidence.source-time"
+        "evidence.source-time",
+        "meaning.arc-2g-observation",
+        "meaning.explicit-non-policy",
+        "store.entity.n5",
+        "store.concept.arc",
+        "store.earlier-mistaken-reading"
       ],
       "derive": [
-        "result.effects-applied",
+        "result.source-retained",
+        "result.observation-applied",
+        "result.qualification-applied",
+        "result.old-reading-qualified",
         "durable.source.arc-observation",
         "durable.observation.arc-2g",
         "durable.qualification.not-policy",
@@ -187,14 +198,29 @@
         "durable.qualification.not-policy",
         "durable.history.old-reading-qualified"
       ],
-      "send": [{"to": "layer", "items": ["result.effects-applied"]}]
+      "send": [{
+        "to": "layer",
+        "items": [
+          "result.source-retained",
+          "result.observation-applied",
+          "result.qualification-applied",
+          "result.old-reading-qualified"
+        ]
+      }]
     },
     {
       "id": "return-result",
       "actor": "layer",
       "mode": "response",
       "note": "Tell the caller what changed and what was deliberately not promoted",
-      "requires": ["result.effects-applied", "meaning.arc-2g-observation", "meaning.explicit-non-policy"],
+      "requires": [
+        "result.source-retained",
+        "result.observation-applied",
+        "result.qualification-applied",
+        "result.old-reading-qualified",
+        "meaning.arc-2g-observation",
+        "meaning.explicit-non-policy"
+      ],
       "derive": ["response.observation-recorded"],
       "send": [{"to": "outside", "items": ["response.observation-recorded"]}]
     }
@@ -210,6 +236,13 @@
       ]
     },
     "not_has": {"durable": ["decision.arc-2g-required"]},
+    "durable_added": [
+      "durable.source.arc-observation",
+      "durable.observation.arc-2g",
+      "durable.qualification.not-policy",
+      "durable.history.old-reading-qualified"
+    ],
+    "durable_removed": [],
     "response": "response.observation-recorded"
   }
 }

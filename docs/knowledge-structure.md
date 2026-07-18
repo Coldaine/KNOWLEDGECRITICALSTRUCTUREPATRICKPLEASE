@@ -121,7 +121,7 @@ Flattening those into one `ARC = 2 GiB` fact reproduces the exact failure that p
 - Which retrieval scopes can make meaningful completeness claims?
 - What repeated distinctions survive examples outside infrastructure and storage?
 
-The [information-flow model](information-flow.md) shows what crosses the boundary. The [interaction traces](interaction-traces.md) pressure-test whether the knowledge described here is actually available, organized, and sufficient at each intermediate step. ([T096](../source/origin-conversation-verbatim.md#t096---user), [T098](../source/origin-conversation-verbatim.md#t098---user))
+The [information-flow model](information-flow.md) shows what crosses the boundary. The [interaction traces](interaction-traces.md) pressure-test whether the knowledge described here is actually available, organized, and sufficient at each intermediate step.
 
 ## Not selected
 

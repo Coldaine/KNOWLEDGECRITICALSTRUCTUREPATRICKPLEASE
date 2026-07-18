@@ -48,10 +48,31 @@ def expect_list(value: Any, label: str) -> list[Any]:
     return value
 
 
-def check_known(items: list[str], known: set[str], label: str) -> None:
+def check_string_list(items: list[Any], label: str) -> None:
+    if any(not isinstance(item, str) or not item for item in items):
+        raise TraceError(f"{label} must contain only non-empty string item names")
+
+
+def check_known(items: list[Any], known: set[str], label: str) -> None:
+    check_string_list(items, label)
     unknown = sorted(set(items) - known)
     if unknown:
         raise TraceError(f"{label} references undeclared items: {', '.join(unknown)}")
+
+
+def check_keys(
+    value: dict[str, Any],
+    *,
+    required: set[str],
+    allowed: set[str],
+    label: str,
+) -> None:
+    missing = sorted(required - set(value))
+    unknown = sorted(set(value) - allowed)
+    if missing:
+        raise TraceError(f"{label} is missing required fields: {', '.join(missing)}")
+    if unknown:
+        raise TraceError(f"{label} has unknown fields: {', '.join(unknown)}")
 
 
 def effective_holdings(actor: str, holdings: dict[str, set[str]], durable: set[str]) -> set[str]:
@@ -60,13 +81,19 @@ def effective_holdings(actor: str, holdings: dict[str, set[str]], durable: set[s
     return holdings[actor]
 
 
-def replay(path: Path, verbose: bool = False) -> tuple[str, int]:
+def replay(path: Path, verbose: bool = False) -> tuple[str, int, str]:
     try:
         fixture = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise TraceError(f"cannot load {path}: {exc}") from exc
 
     root = expect_mapping(fixture, str(path))
+    check_keys(
+        root,
+        required={"id", "title", "basis", "feasibility", "items", "initial", "steps", "expected"},
+        allowed={"id", "title", "basis", "feasibility", "items", "initial", "steps", "expected"},
+        label=str(path),
+    )
     fixture_id = root.get("id")
     if not isinstance(fixture_id, str) or not fixture_id:
         raise TraceError(f"{path}: id must be a non-empty string")
@@ -80,6 +107,11 @@ def replay(path: Path, verbose: bool = False) -> tuple[str, int]:
         allowed = ", ".join(sorted(FEASIBILITY))
         raise TraceError(f"{fixture_id}: feasibility must be one of {allowed}")
 
+    basis = expect_list(root.get("basis"), f"{fixture_id}.basis")
+    check_string_list(basis, f"{fixture_id}.basis")
+    if not basis:
+        raise TraceError(f"{fixture_id}.basis cannot be empty")
+
     item_map = expect_mapping(root.get("items"), f"{fixture_id}.items")
     known = set(item_map)
     if not known:
@@ -91,6 +123,12 @@ def replay(path: Path, verbose: bool = False) -> tuple[str, int]:
             raise TraceError(f"{fixture_id}: item {token} needs a description")
 
     initial = expect_mapping(root.get("initial"), f"{fixture_id}.initial")
+    check_keys(
+        initial,
+        required={"outside", "layer", "store", "durable"},
+        allowed={"outside", "layer", "store", "durable"},
+        label=f"{fixture_id}.initial",
+    )
     holdings: dict[str, set[str]] = {actor: set() for actor in ACTORS}
     for actor in ACTORS:
         values = expect_list(initial.get(actor, []), f"{fixture_id}.initial.{actor}")
@@ -105,8 +143,17 @@ def replay(path: Path, verbose: bool = False) -> tuple[str, int]:
         raise TraceError(f"{fixture_id}: steps cannot be empty")
 
     seen_step_ids: set[str] = set()
+    returned_to_outside: list[str] = []
+    durable_addition_events: list[str] = []
+    durable_removal_events: list[str] = []
     for index, raw_step in enumerate(steps, start=1):
         step = expect_mapping(raw_step, f"{fixture_id}.steps[{index}]")
+        check_keys(
+            step,
+            required={"id", "actor", "mode", "note", "requires"},
+            allowed={"id", "actor", "mode", "note", "requires", "derive", "send", "persist", "remove"},
+            label=f"{fixture_id}.steps[{index}]",
+        )
         step_id = step.get("id")
         if not isinstance(step_id, str) or not step_id:
             raise TraceError(f"{fixture_id}: step {index} needs a non-empty id")
@@ -148,6 +195,12 @@ def replay(path: Path, verbose: bool = False) -> tuple[str, int]:
         rendered_directions: list[str] = []
         for send_index, raw_send in enumerate(sends, start=1):
             send = expect_mapping(raw_send, f"{fixture_id}/{step_id}.send[{send_index}]")
+            check_keys(
+                send,
+                required={"to", "items"},
+                allowed={"to", "items"},
+                label=f"{fixture_id}/{step_id}.send[{send_index}]",
+            )
             target = send.get("to")
             if target not in ACTORS:
                 raise TraceError(f"{fixture_id}/{step_id}: invalid transfer target {target!r}")
@@ -164,6 +217,13 @@ def replay(path: Path, verbose: bool = False) -> tuple[str, int]:
                     + ", ".join(unavailable)
                 )
             holdings[target].update(sent_items)
+            if actor == "layer" and target == "outside":
+                if index != len(steps) or send_index != len(sends):
+                    raise TraceError(
+                        f"{fixture_id}/{step_id}: the layer-to-outside return must be "
+                        "the final transfer of the final step"
+                    )
+                returned_to_outside.extend(sent_items)
             rendered_directions.append(DIRECTIONS[(actor, target)])
 
         if persist or remove:
@@ -181,6 +241,8 @@ def replay(path: Path, verbose: bool = False) -> tuple[str, int]:
                     f"{fixture_id}/{step_id}: cannot remove absent durable items: "
                     + ", ".join(missing_remove)
                 )
+            durable_addition_events.extend(item for item in persist if item not in durable)
+            durable_removal_events.extend(remove)
             durable.update(persist)
             durable.difference_update(remove)
 
@@ -197,8 +259,26 @@ def replay(path: Path, verbose: bool = False) -> tuple[str, int]:
             print(f"  {index:02d} {direction:<7} {step_id}: {note}{suffix}")
 
     expected = expect_mapping(root.get("expected"), f"{fixture_id}.expected")
+    check_keys(
+        expected,
+        required={"has", "not_has", "durable_added", "durable_removed", "response"},
+        allowed={"has", "not_has", "durable_added", "durable_removed", "response"},
+        label=f"{fixture_id}.expected",
+    )
     expected_has = expect_mapping(expected.get("has", {}), f"{fixture_id}.expected.has")
     expected_not = expect_mapping(expected.get("not_has", {}), f"{fixture_id}.expected.not_has")
+    check_keys(
+        expected_has,
+        required=set(),
+        allowed=LOCATIONS,
+        label=f"{fixture_id}.expected.has",
+    )
+    check_keys(
+        expected_not,
+        required=set(),
+        allowed=LOCATIONS,
+        label=f"{fixture_id}.expected.not_has",
+    )
 
     def contents(location: str) -> set[str]:
         if location == "durable":
@@ -227,10 +307,28 @@ def replay(path: Path, verbose: bool = False) -> tuple[str, int]:
     response = expected.get("response")
     if not isinstance(response, str) or response not in known:
         raise TraceError(f"{fixture_id}.expected.response must name one declared item")
-    if response not in holdings["outside"]:
-        raise TraceError(f"{fixture_id}: expected response {response} never reached outside")
+    if returned_to_outside != [response]:
+        raise TraceError(
+            f"{fixture_id}: layer-to-outside result does not exactly match expected response "
+            f"(expected {[response]}, observed {returned_to_outside})"
+        )
 
-    return f"{fixture_id}: {title}", len(steps)
+    durable_added = expect_list(expected.get("durable_added"), f"{fixture_id}.expected.durable_added")
+    durable_removed = expect_list(expected.get("durable_removed"), f"{fixture_id}.expected.durable_removed")
+    check_known(durable_added, known, f"{fixture_id}.expected.durable_added")
+    check_known(durable_removed, known, f"{fixture_id}.expected.durable_removed")
+    if sorted(durable_addition_events) != sorted(durable_added):
+        raise TraceError(
+            f"{fixture_id}: durable addition events differ; expected {sorted(durable_added)}, "
+            f"observed {sorted(durable_addition_events)}"
+        )
+    if sorted(durable_removal_events) != sorted(durable_removed):
+        raise TraceError(
+            f"{fixture_id}: durable removal events differ; expected {sorted(durable_removed)}, "
+            f"observed {sorted(durable_removal_events)}"
+        )
+
+    return f"{fixture_id}: {title}", len(steps), feasibility
 
 
 def find_fixtures(root: Path, selected: list[str]) -> list[Path]:
@@ -264,9 +362,9 @@ def main() -> int:
     total_steps = 0
     for path in paths:
         try:
-            label, steps = replay(path, verbose=args.verbose)
+            label, steps, feasibility = replay(path, verbose=args.verbose)
             total_steps += steps
-            print(f"PASS {label} ({steps} steps)")
+            print(f"TRACE VALID [{feasibility}] {label} ({steps} steps)")
         except TraceError as exc:
             failures += 1
             print(f"FAIL {path.name}: {exc}", file=sys.stderr)
@@ -274,7 +372,7 @@ def main() -> int:
     if failures:
         print(f"{failures} of {len(paths)} fixtures failed", file=sys.stderr)
         return 1
-    print(f"Validated {len(paths)} fixtures and {total_steps} explicit steps.")
+    print(f"Dataflow-checked {len(paths)} candidate fixtures and {total_steps} declared steps.")
     return 0
 
 

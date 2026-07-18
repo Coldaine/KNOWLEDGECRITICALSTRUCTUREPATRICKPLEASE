@@ -81,6 +81,8 @@
   "expected": {
     "has": {"outside": ["response.conflict-remains"]},
     "not_has": {"durable": ["durable.winner.disk-joined"]},
+    "durable_added": [],
+    "durable_removed": [],
     "response": "response.conflict-remains"
   }
 }

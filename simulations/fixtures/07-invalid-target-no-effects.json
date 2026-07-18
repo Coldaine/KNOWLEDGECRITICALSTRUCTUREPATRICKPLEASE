@@ -52,7 +52,14 @@
       "actor": "store",
       "mode": "lookup",
       "note": "Return two resolved targets and an explicit unresolved-operation result",
-      "requires": ["lookup.all-affected-targets", "store.entity.n5-arc", "store.claim.old-reading"],
+      "requires": [
+        "lookup.all-affected-targets",
+        "hint.n5-arc",
+        "hint.old-reading",
+        "hint.migration-operation",
+        "store.entity.n5-arc",
+        "store.claim.old-reading"
+      ],
       "derive": ["status.migration-operation-unresolved", "coverage.targets-complete"],
       "send": [{"to": "layer", "items": ["store.entity.n5-arc", "store.claim.old-reading", "status.migration-operation-unresolved", "coverage.targets-complete"]}]
     },
@@ -87,6 +94,8 @@
   "expected": {
     "has": {"outside": ["response.operation-target-needed"]},
     "not_has": {"durable": ["durable.observation.applied", "durable.correction.applied", "durable.link.applied"]},
+    "durable_added": [],
+    "durable_removed": [],
     "response": "response.operation-target-needed"
   }
 }

@@ -61,6 +61,8 @@
   "expected": {
     "has": {"outside": ["response.partial-and-indeterminate"], "durable": ["store.effect.observation-applied", "status.correction-indeterminate", "status.link-not-applied"]},
     "not_has": {"durable": ["durable.replayed-observation"]},
+    "durable_added": [],
+    "durable_removed": [],
     "response": "response.partial-and-indeterminate"
   }
 }

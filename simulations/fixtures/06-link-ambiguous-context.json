@@ -62,6 +62,8 @@
   "expected": {
     "has": {"outside": ["response.choose-context"]},
     "not_has": {"durable": ["durable.link.guessed-storage", "durable.duplicate.tank-geometry"]},
+    "durable_added": [],
+    "durable_removed": [],
     "response": "response.choose-context"
   }
 }

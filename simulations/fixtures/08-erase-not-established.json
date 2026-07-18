@@ -20,6 +20,11 @@
     "store.safety.verify-before-erase": "The stored destructive precondition requires successful retained verification evidence",
     "store.verification.read-ran": "A checksum read is known to have run",
     "store.verification.no-retained-success": "No retained successful result and exit status or equivalent proof is established",
+    "store.currentness.topology": "The topology evidence has an explicit observation time and freshness standing",
+    "store.source.topology": "A source pointer for the current topology and disk role",
+    "store.source.copy": "A source pointer for the completed copy state",
+    "store.source.verification": "A source pointer for the verification attempt and missing retained result",
+    "store.risk.remaining-expansion": "The stored remaining risk that erase and expansion are separate world actions",
     "coverage.erase-categories-complete": "Every requested category and source drill-down was searched without truncation",
     "meaning.precondition-gap": "The layer finds that a read event does not satisfy the stored verification-success precondition",
     "response.erase-not-established": "The caller receives not established, the blocking evidence gap, and no-action notice",
@@ -39,7 +44,12 @@
       "store.copy.completed",
       "store.safety.verify-before-erase",
       "store.verification.read-ran",
-      "store.verification.no-retained-success"
+      "store.verification.no-retained-success",
+      "store.currentness.topology",
+      "store.source.topology",
+      "store.source.copy",
+      "store.source.verification",
+      "store.risk.remaining-expansion"
     ]
   },
   "steps": [
@@ -90,7 +100,12 @@
         "store.copy.completed",
         "store.safety.verify-before-erase",
         "store.verification.read-ran",
-        "store.verification.no-retained-success"
+        "store.verification.no-retained-success",
+        "store.currentness.topology",
+        "store.source.topology",
+        "store.source.copy",
+        "store.source.verification",
+        "store.risk.remaining-expansion"
       ],
       "derive": ["coverage.erase-categories-complete"],
       "send": [{
@@ -102,6 +117,11 @@
           "store.safety.verify-before-erase",
           "store.verification.read-ran",
           "store.verification.no-retained-success",
+          "store.currentness.topology",
+          "store.source.topology",
+          "store.source.copy",
+          "store.source.verification",
+          "store.risk.remaining-expansion",
           "coverage.erase-categories-complete"
         ]
       }]
@@ -118,6 +138,11 @@
         "store.safety.verify-before-erase",
         "store.verification.read-ran",
         "store.verification.no-retained-success",
+        "store.currentness.topology",
+        "store.source.topology",
+        "store.source.copy",
+        "store.source.verification",
+        "store.risk.remaining-expansion",
         "coverage.erase-categories-complete",
         "rule.read-only-no-world-action"
       ],
@@ -128,7 +153,15 @@
       "actor": "layer",
       "mode": "response",
       "note": "Return the missing retained-success evidence as the blocker and perform no action",
-      "requires": ["meaning.precondition-gap", "store.verification.no-retained-success", "rule.read-only-no-world-action"],
+      "requires": [
+        "meaning.precondition-gap",
+        "store.verification.no-retained-success",
+        "store.source.topology",
+        "store.source.copy",
+        "store.source.verification",
+        "store.risk.remaining-expansion",
+        "rule.read-only-no-world-action"
+      ],
       "derive": ["response.erase-not-established"],
       "send": [{"to": "outside", "items": ["response.erase-not-established"]}]
     }
@@ -136,6 +169,8 @@
   "expected": {
     "has": {"outside": ["response.erase-not-established"]},
     "not_has": {"durable": ["durable.generated-safety-answer", "world.disk-erased", "world.disk-added-to-tank"]},
+    "durable_added": [],
+    "durable_removed": [],
     "response": "response.erase-not-established"
   }
 }

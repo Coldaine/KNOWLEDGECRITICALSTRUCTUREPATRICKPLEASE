@@ -128,6 +128,8 @@
   "expected": {
     "has": {"outside": ["response.need-source"]},
     "not_has": {"durable": ["durable.observation.arc-2g"]},
+    "durable_added": [],
+    "durable_removed": [],
     "response": "response.need-source"
   }
 }

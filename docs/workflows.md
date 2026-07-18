@@ -368,6 +368,45 @@ sequenceDiagram
 
 Transcript basis: `T013–T024`, `T043–T052`, `T055–T061`.
 
+## 9. Discover organization from an ordinary submission
+
+**Input**
+
+- A work agent reports authenticated N5 output about `tank`, with source and observation time.
+- It asks to record what was observed. It does not name storage, migration, inference planning, relation types, or desired links.
+
+**Steps**
+
+1. The translation layer separates the evidence, observation, mentioned subjects, and task context.
+2. It asks the durable side to resolve the subjects, find possible existing knowledge, and return candidate contexts and relationships with their match basis.
+3. It uses the explicit duplicate-match result to decide whether to create, reuse, or qualify content, then distinguishes direct subject organization from contextual relationships suggested by the returned neighborhood.
+4. It proposes the observation and supported organization with separate standing for direct and inferred relationships.
+5. The durable side returns a result for every content and organization effect.
+6. The translation layer reports what was recorded, where it became discoverable, what remains provisional, and any ambiguity.
+
+**Expected result**
+
+- The outside agent supplies ordinary evidence rather than a link plan. When no existing match is returned, the resulting piece becomes discoverable through supported contexts without copying its content, while weaker inferred relationships remain visibly provisional.
+
+**Key failure variant**
+
+- If `tank` or a candidate context is ambiguous, no accepted relationship is created by guesswork. The response returns the candidates and missing distinction.
+
+```mermaid
+sequenceDiagram
+    participant W as Work agent
+    participant T as Translation layer
+    participant K as Knowledge store
+    W->>T: Submit ordinary evidence and source
+    T->>K: Resolve subjects, possible duplicates, and candidate contexts
+    K-->>T: Candidates, relationship paths, standing, and coverage
+    T->>K: Propose content plus direct and provisional organization
+    K-->>T: Per-effect content and relationship outcomes
+    T-->>W: Return recorded meaning, discovery paths, and ambiguity
+```
+
+Transcript basis: `T043–T048`, `T055–T061`, `T096–T098`.
+
 ## Questions these workflows leave open
 
 - Is raw evidence retained independently when its interpretation fails?

@@ -62,6 +62,8 @@
   "expected": {
     "has": {"outside": ["response.prior-result"], "durable": ["store.prior-effect"]},
     "not_has": {"durable": ["durable.duplicate-effect"]},
+    "durable_added": [],
+    "durable_removed": [],
     "response": "response.prior-result"
   }
 }
