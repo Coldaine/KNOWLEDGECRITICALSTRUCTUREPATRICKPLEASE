@@ -1,0 +1,215 @@
+{
+  "id": "01-observation-normal",
+  "title": "Record the N5 ARC observation without promoting it to policy",
+  "basis": ["T040-T042", "T055-T061", "interaction-trace-1"],
+  "feasibility": "conditional",
+  "items": {
+    "request.record-observation": "The caller asks to record one observation",
+    "target.hint.n5": "The caller names N5",
+    "target.hint.arc": "The caller names zfs_arc_max",
+    "evidence.arc-raw": "Authenticated output reports zfs_arc_max=2147483648",
+    "evidence.source-time": "The output is bound to a source and observation time",
+    "qualification.not-policy": "The caller says the live value is not an accepted permanent requirement",
+    "rule.distinguish-observation-decision": "The layer is instructed not to flatten observations into decisions",
+    "meaning.arc-2g-observation": "The layer interprets 2147483648 as a 2 GiB live observation",
+    "meaning.explicit-non-policy": "The layer preserves the supplied non-policy qualification",
+    "lookup.identity-request": "A bounded request to resolve N5 and ARC",
+    "store.entity.n5": "The durable identity matching N5",
+    "store.concept.arc": "The durable concept matching zfs_arc_max",
+    "coverage.identity-unique": "The store reports unique matches for both targets",
+    "lookup.related-request": "A bounded request for related observations, decisions, and history",
+    "store.earlier-mistaken-reading": "Earlier material treated the 2 GiB setting as settled sizing",
+    "coverage.related-complete": "The requested related-history scope was fully searched",
+    "proposal.retain-source": "Proposed effect to retain the submitted evidence and source",
+    "proposal.record-observation": "Proposed effect to record the 2 GiB live observation",
+    "proposal.preserve-qualification": "Proposed effect to preserve the non-policy qualification",
+    "proposal.qualify-old-reading": "Proposed effect to qualify the exact older reading",
+    "result.effects-applied": "The store reports all four supported effects as applied",
+    "durable.source.arc-observation": "Retained source evidence for the submitted observation",
+    "durable.observation.arc-2g": "Durable live ARC observation",
+    "durable.qualification.not-policy": "Durable distinction that the observation is not policy",
+    "durable.history.old-reading-qualified": "The earlier mistaken reading remains but is qualified",
+    "decision.arc-2g-required": "A permanent decision that 2 GiB is required",
+    "response.observation-recorded": "The caller is told exactly what was recorded and that no sizing decision was created"
+  },
+  "initial": {
+    "outside": [
+      "request.record-observation",
+      "target.hint.n5",
+      "target.hint.arc",
+      "evidence.arc-raw",
+      "evidence.source-time",
+      "qualification.not-policy"
+    ],
+    "layer": ["rule.distinguish-observation-decision"],
+    "store": [],
+    "durable": [
+      "store.entity.n5",
+      "store.concept.arc",
+      "store.earlier-mistaken-reading"
+    ]
+  },
+  "steps": [
+    {
+      "id": "submit",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send intent, evidence, source, target hints, and qualification without store structure",
+      "requires": [
+        "request.record-observation",
+        "target.hint.n5",
+        "target.hint.arc",
+        "evidence.arc-raw",
+        "evidence.source-time",
+        "qualification.not-policy"
+      ],
+      "send": [{
+        "to": "layer",
+        "items": [
+          "request.record-observation",
+          "target.hint.n5",
+          "target.hint.arc",
+          "evidence.arc-raw",
+          "evidence.source-time",
+          "qualification.not-policy"
+        ]
+      }]
+    },
+    {
+      "id": "interpret",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Separate raw evidence, observed value, and explicit qualification",
+      "requires": [
+        "request.record-observation",
+        "evidence.arc-raw",
+        "qualification.not-policy",
+        "rule.distinguish-observation-decision"
+      ],
+      "derive": ["meaning.arc-2g-observation", "meaning.explicit-non-policy"]
+    },
+    {
+      "id": "request-identity-resolution",
+      "actor": "layer",
+      "mode": "lookup",
+      "note": "Ask the durable side to resolve the two target hints",
+      "requires": ["target.hint.n5", "target.hint.arc"],
+      "derive": ["lookup.identity-request"],
+      "send": [{"to": "store", "items": ["lookup.identity-request", "target.hint.n5", "target.hint.arc"]}]
+    },
+    {
+      "id": "return-identities",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return unique identities and the match status",
+      "requires": ["lookup.identity-request", "store.entity.n5", "store.concept.arc"],
+      "derive": ["coverage.identity-unique"],
+      "send": [{"to": "layer", "items": ["store.entity.n5", "store.concept.arc", "coverage.identity-unique"]}]
+    },
+    {
+      "id": "request-related-history",
+      "actor": "layer",
+      "mode": "lookup",
+      "note": "Request bounded related observations, decisions, and qualifications",
+      "requires": ["store.entity.n5", "store.concept.arc", "coverage.identity-unique"],
+      "derive": ["lookup.related-request"],
+      "send": [{"to": "store", "items": ["lookup.related-request", "store.entity.n5", "store.concept.arc"]}]
+    },
+    {
+      "id": "return-related-history",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return the older reading and the limits of the search",
+      "requires": ["lookup.related-request", "store.earlier-mistaken-reading"],
+      "derive": ["coverage.related-complete"],
+      "send": [{"to": "layer", "items": ["store.earlier-mistaken-reading", "coverage.related-complete"]}]
+    },
+    {
+      "id": "form-effects",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Propose source, observation, qualification, and history effects without a sizing decision",
+      "requires": [
+        "meaning.arc-2g-observation",
+        "meaning.explicit-non-policy",
+        "evidence.source-time",
+        "store.entity.n5",
+        "store.concept.arc",
+        "store.earlier-mistaken-reading",
+        "coverage.related-complete"
+      ],
+      "derive": [
+        "proposal.retain-source",
+        "proposal.record-observation",
+        "proposal.preserve-qualification",
+        "proposal.qualify-old-reading"
+      ],
+      "send": [{
+        "to": "store",
+        "items": [
+          "evidence.arc-raw",
+          "evidence.source-time",
+          "meaning.arc-2g-observation",
+          "meaning.explicit-non-policy",
+          "store.entity.n5",
+          "store.concept.arc",
+          "store.earlier-mistaken-reading",
+          "proposal.retain-source",
+          "proposal.record-observation",
+          "proposal.preserve-qualification",
+          "proposal.qualify-old-reading"
+        ]
+      }]
+    },
+    {
+      "id": "apply-effects",
+      "actor": "store",
+      "mode": "enforcement",
+      "note": "Evaluate every effect and report the durable result",
+      "requires": [
+        "proposal.retain-source",
+        "proposal.record-observation",
+        "proposal.preserve-qualification",
+        "proposal.qualify-old-reading",
+        "evidence.arc-raw",
+        "evidence.source-time"
+      ],
+      "derive": [
+        "result.effects-applied",
+        "durable.source.arc-observation",
+        "durable.observation.arc-2g",
+        "durable.qualification.not-policy",
+        "durable.history.old-reading-qualified"
+      ],
+      "persist": [
+        "durable.source.arc-observation",
+        "durable.observation.arc-2g",
+        "durable.qualification.not-policy",
+        "durable.history.old-reading-qualified"
+      ],
+      "send": [{"to": "layer", "items": ["result.effects-applied"]}]
+    },
+    {
+      "id": "return-result",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Tell the caller what changed and what was deliberately not promoted",
+      "requires": ["result.effects-applied", "meaning.arc-2g-observation", "meaning.explicit-non-policy"],
+      "derive": ["response.observation-recorded"],
+      "send": [{"to": "outside", "items": ["response.observation-recorded"]}]
+    }
+  ],
+  "expected": {
+    "has": {
+      "outside": ["response.observation-recorded"],
+      "durable": [
+        "durable.source.arc-observation",
+        "durable.observation.arc-2g",
+        "durable.qualification.not-policy",
+        "durable.history.old-reading-qualified"
+      ]
+    },
+    "not_has": {"durable": ["decision.arc-2g-required"]},
+    "response": "response.observation-recorded"
+  }
+}

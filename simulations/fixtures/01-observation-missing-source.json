@@ -1,0 +1,133 @@
+{
+  "id": "01-observation-missing-source",
+  "title": "Reject a current ARC observation when source binding is missing",
+  "basis": ["T040-T042", "T055-T061", "interaction-trace-1-pressure"],
+  "feasibility": "conditional",
+  "items": {
+    "request.record-observation": "The caller asks to record one observation",
+    "target.hint.n5": "The caller names N5",
+    "target.hint.arc": "The caller names zfs_arc_max",
+    "evidence.arc-raw": "Unbound text reports zfs_arc_max=2147483648",
+    "qualification.not-policy": "The caller says the live value is not an accepted permanent requirement",
+    "rule.source-required-for-current-observation": "The candidate trace requires source and time before accepting a current observation",
+    "meaning.source-missing": "The layer notices that host and observation time are not established",
+    "lookup.identity-request": "A bounded identity request",
+    "store.entity.n5": "The durable identity matching N5",
+    "store.concept.arc": "The durable concept matching zfs_arc_max",
+    "coverage.identity-unique": "The store reports unique target matches",
+    "proposal.current-observation": "A proposed current observation",
+    "result.rejected-missing-source": "The durable side rejects the current observation for missing source binding",
+    "durable.observation.arc-2g": "A durable current ARC observation",
+    "response.need-source": "The caller is told that no current observation was accepted and what source information is missing"
+  },
+  "initial": {
+    "outside": [
+      "request.record-observation",
+      "target.hint.n5",
+      "target.hint.arc",
+      "evidence.arc-raw",
+      "qualification.not-policy"
+    ],
+    "layer": ["rule.source-required-for-current-observation"],
+    "store": [],
+    "durable": ["store.entity.n5", "store.concept.arc"]
+  },
+  "steps": [
+    {
+      "id": "submit",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send the observation text without a host-bound source or observation time",
+      "requires": [
+        "request.record-observation",
+        "target.hint.n5",
+        "target.hint.arc",
+        "evidence.arc-raw",
+        "qualification.not-policy"
+      ],
+      "send": [{
+        "to": "layer",
+        "items": [
+          "request.record-observation",
+          "target.hint.n5",
+          "target.hint.arc",
+          "evidence.arc-raw",
+          "qualification.not-policy"
+        ]
+      }]
+    },
+    {
+      "id": "detect-source-gap",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Recognize that the text does not establish where or when the value was observed",
+      "requires": ["evidence.arc-raw", "rule.source-required-for-current-observation"],
+      "derive": ["meaning.source-missing"]
+    },
+    {
+      "id": "request-identity-resolution",
+      "actor": "layer",
+      "mode": "lookup",
+      "note": "Resolve the named targets without treating resolution as proof of the evidence source",
+      "requires": ["target.hint.n5", "target.hint.arc"],
+      "derive": ["lookup.identity-request"],
+      "send": [{"to": "store", "items": ["lookup.identity-request", "target.hint.n5", "target.hint.arc"]}]
+    },
+    {
+      "id": "return-identities",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return unique target identities only",
+      "requires": ["lookup.identity-request", "store.entity.n5", "store.concept.arc"],
+      "derive": ["coverage.identity-unique"],
+      "send": [{"to": "layer", "items": ["store.entity.n5", "store.concept.arc", "coverage.identity-unique"]}]
+    },
+    {
+      "id": "propose-and-expose-gap",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Expose the missing source in the proposal instead of manufacturing provenance",
+      "requires": [
+        "request.record-observation",
+        "evidence.arc-raw",
+        "meaning.source-missing",
+        "store.entity.n5",
+        "store.concept.arc"
+      ],
+      "derive": ["proposal.current-observation"],
+      "send": [{
+        "to": "store",
+        "items": [
+          "proposal.current-observation",
+          "evidence.arc-raw",
+          "meaning.source-missing",
+          "store.entity.n5",
+          "store.concept.arc"
+        ]
+      }]
+    },
+    {
+      "id": "reject-current-observation",
+      "actor": "store",
+      "mode": "enforcement",
+      "note": "Reject the current observation because source binding is absent",
+      "requires": ["proposal.current-observation", "meaning.source-missing"],
+      "derive": ["result.rejected-missing-source"],
+      "send": [{"to": "layer", "items": ["result.rejected-missing-source"]}]
+    },
+    {
+      "id": "return-source-gap",
+      "actor": "layer",
+      "mode": "response",
+      "note": "State that no current fact was accepted and request the missing source and time",
+      "requires": ["result.rejected-missing-source", "meaning.source-missing"],
+      "derive": ["response.need-source"],
+      "send": [{"to": "outside", "items": ["response.need-source"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.need-source"]},
+    "not_has": {"durable": ["durable.observation.arc-2g"]},
+    "response": "response.need-source"
+  }
+}
