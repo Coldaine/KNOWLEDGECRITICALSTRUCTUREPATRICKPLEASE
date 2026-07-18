@@ -1,6 +1,6 @@
 # Candidate interaction traces
 
-These traces replace the hidden verbs in the original [workflow stories](workflows.md) with explicit information movement. They are candidate golden traces, not accepted product behavior. Review can correct them before they guide architecture.
+These traces replace the hidden verbs in the original [workflow stories](workflows.md) with explicit information movement. They directly test the user's questions about intermediate feasibility, organization, retrieval, and left/right payloads. ([T096](../source/origin-conversation-verbatim.md#t096---user), [T098](../source/origin-conversation-verbatim.md#t098---user)) They are candidate golden traces, not accepted product behavior. Review can correct them before they guide architecture.
 
 Direction labels come from the [information-flow model](information-flow.md):
 

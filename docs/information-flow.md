@@ -1,6 +1,6 @@
 # Information flow across the knowledge boundary
 
-This is the part the earlier workflows skipped. They described good outcomes but hid the hard work inside words such as “resolve,” “retrieve,” “interpret,” and “assemble.” This document makes those dependencies visible before any storage model or API is chosen.
+This is the part the earlier workflows skipped. They described good outcomes but hid the hard work inside words such as “resolve,” “retrieve,” “interpret,” and “assemble.” The user explicitly asked whether an agent could perform every intermediate step, whether the needed knowledge was organized and retrievable, and what information moved in both directions. ([T096](../source/origin-conversation-verbatim.md#t096---user), [T098](../source/origin-conversation-verbatim.md#t098---user))
 
 The left and right labels describe a semantic boundary, not a deployment topology.
 

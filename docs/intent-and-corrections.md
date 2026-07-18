@@ -19,12 +19,15 @@ The user's statements and corrections define the current intent. Assistant propo
 8. **“Knowledge agent” is misleading.** The role includes encoding, storing, organizing, reconciling, and retrieving knowledge; retrieval alone understates the uncertain half of the problem. ([T061](../source/origin-conversation-verbatim.md#t061---user))
 9. **Behavior comes before design.** The user asked for an overview, distilled goals, fictional workflows, diagrams, mini simulations, candidate states, and a harness before architecture or code. ([T061](../source/origin-conversation-verbatim.md#t061---user))
 10. **The actual transcript is the evidence.** A compacted summary is not an acceptable substitute for the complete conversation when deriving intent. ([T069](../source/origin-conversation-verbatim.md#t069---user))
+11. **A workflow story is not yet a simulation.** Every intermediate step must expose the information supplied to the layer, what the layer can reason from it, what organized knowledge must be retrievable, and what information moves left and right. ([T096](../source/origin-conversation-verbatim.md#t096---user))
+12. **The N5 examples serve the knowledge structure.** Operational recap or mock-test language must not displace the central work: discovering the reusable knowledge model and its bidirectional translation boundary. ([T098](../source/origin-conversation-verbatim.md#t098---user))
 
 ## Accepted direction
 
 - Preserve the full conversation and keep every derived claim traceable to it. ([T061](../source/origin-conversation-verbatim.md#t061---user), [T069](../source/origin-conversation-verbatim.md#t069---user))
 - Describe the desired interactions in plain steps before naming components or selecting technology. ([T061](../source/origin-conversation-verbatim.md#t061---user), [T063](../source/origin-conversation-verbatim.md#t063---user))
 - Treat the internal translation layer and external work agent as different roles with different contexts and tools. ([T055](../source/origin-conversation-verbatim.md#t055---user), [T057](../source/origin-conversation-verbatim.md#t057---user), [T059](../source/origin-conversation-verbatim.md#t059---user))
+- Test whether every intermediate action is possible with the exact information available, including what retrieval must return and what crosses each boundary. ([T096](../source/origin-conversation-verbatim.md#t096---user), [T098](../source/origin-conversation-verbatim.md#t098---user))
 - Keep the documents concise, direct, and free of invented policy language. ([T063](../source/origin-conversation-verbatim.md#t063---user))
 
 ## Still hypotheses

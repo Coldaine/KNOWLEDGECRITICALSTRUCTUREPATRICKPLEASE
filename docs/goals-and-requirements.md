@@ -16,6 +16,7 @@
 - **Expression:** Use short, clear bullets that explain what is wanted and why; avoid invented guardrails and inflated policy language. ([T063](../source/origin-conversation-verbatim.md#t063---user))
 - **Workflow coverage:** Write fictional, primitive flows for information arriving, being interpreted, transformed, stored, linked, retrieved, corrected, conflicted, duplicated, or rejected. ([T061](../source/origin-conversation-verbatim.md#t061---user))
 - **Workflow detail:** Record each interaction step by step, then diagram the same flow and identify what each participating part did. ([T061](../source/origin-conversation-verbatim.md#t061---user))
+- **Workflow feasibility:** For every intermediate step, state the exact information already available, what a bounded model can infer, what must be retrieved or enforced, and what moves in each direction. Do not hide the design inside verbs such as `resolve` or `assemble`. ([T096](../source/origin-conversation-verbatim.md#t096---user), [T098](../source/origin-conversation-verbatim.md#t098---user))
 - **Progressive preservation:** Keep the source, distilled goals, workflow versions, diagrams, and simulation results as the spike develops. ([T061](../source/origin-conversation-verbatim.md#t061---user))
 - **Simulation:** Exercise normal, ambiguous, conflicting, and failed interactions as mini simulations before accepting a design. ([T061](../source/origin-conversation-verbatim.md#t061---user))
 - **State discovery:** Use observed workflow transitions to decide whether explicit states or one or more state machines are useful. Do not assume them in advance. ([T061](../source/origin-conversation-verbatim.md#t061---user))
@@ -30,6 +31,8 @@
 - The narrow interaction supports stronger validation and enforcement without imposing that machinery on the external agent. The simulations will determine what enforcement is actually needed. ([T059](../source/origin-conversation-verbatim.md#t059---user), [T061](../source/origin-conversation-verbatim.md#t061---user))
 - A knowledge piece can be reused and linked across relevant contexts without forcing every piece into the same set of fields. ([T043](../source/origin-conversation-verbatim.md#t043---user), [T046](../source/origin-conversation-verbatim.md#t046---user))
 - Default results stay useful and concise rather than exposing every piece of metadata. ([T046](../source/origin-conversation-verbatim.md#t046---user))
+- The translation layer never relies on hidden task context: each judgment can be traced to left input, fixed role instructions, or bounded material returned from the durable side. ([T096](../source/origin-conversation-verbatim.md#t096---user))
+- Retrieval reports enough organization, provenance, currentness, conflict, and coverage information for the layer to know what the returned material can and cannot establish. ([T096](../source/origin-conversation-verbatim.md#t096---user))
 
 ## Deferred choices
 

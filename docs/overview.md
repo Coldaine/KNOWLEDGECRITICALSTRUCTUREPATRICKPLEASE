@@ -22,6 +22,7 @@
 - Preserve the source conversation, then distill its goals, requirements, and reasons. ([T061](../source/origin-conversation-verbatim.md#t061---user))
 - Write primitive fictional workflows showing information arriving, being interpreted, transformed, stored, retrieved, corrected, or rejected. ([T061](../source/origin-conversation-verbatim.md#t061---user))
 - Turn those workflows into diagrams and mini simulations, preserving each useful artifact as the model becomes clearer. ([T061](../source/origin-conversation-verbatim.md#t061---user))
+- Make every simulation show what enters from the left, what the durable side returns from the right, what the model can infer at each step, and what remains impossible without additional information or tooling. ([T096](../source/origin-conversation-verbatim.md#t096---user), [T098](../source/origin-conversation-verbatim.md#t098---user))
 - Use the simulations to discover components, distinctions, and possible states instead of assuming them first. ([T061](../source/origin-conversation-verbatim.md#t061---user))
 - Design software only after the expected behavior is concrete enough to target. ([T061](../source/origin-conversation-verbatim.md#t061---user), [T063](../source/origin-conversation-verbatim.md#t063---user))
 

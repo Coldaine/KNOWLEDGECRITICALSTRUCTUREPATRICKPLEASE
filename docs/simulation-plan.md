@@ -1,76 +1,70 @@
-# Simulation plan
+# Simulation status and next review
 
 ## Purpose
 
-The simulations turn the current workflow stories into concrete examples we can challenge before choosing components or writing production code. They are a way to discover behavior, vocabulary, and possible states—not a contract invented in advance. ([T061](../source/origin-conversation-verbatim.md#t061---user), [T063](../source/origin-conversation-verbatim.md#t063---user))
+The simulations make each intermediate dependency visible before any architecture is selected. They test whether the outside caller, short-lived translation layer, and durable side have the information needed for every step. They do not pretend that replaying a trace proves model quality or database behavior. ([T061](../source/origin-conversation-verbatim.md#t061---user))
 
-## Order of work
+## First pass completed
 
-1. Start with one [workflow](workflows.md) and write the interaction step by step.
-2. Run the same interaction with one changed condition: missing, incorrect, duplicated, reordered, conflicting, repeated, or interrupted input.
-3. Review what we expected to happen, what remains unclear, and whether the workflow itself needs correction.
-4. Compare several traces before naming operations, states, or invariants in the [provisional behavior model](behavior-model.md).
-5. Preserve each reviewed trace and the questions it exposed.
-6. Encode the traces in a small reference harness only after their useful shape becomes clear.
+- The eight [workflow stories](workflows.md) have been expanded into [candidate interaction traces](interaction-traces.md).
+- Every trace records starting durable knowledge, exact left input, left/right transfers, internal semantic judgments, durable effects, returned results, feasibility limits, and a pressure variation.
+- Each primary flow and first pressure variation has a separate schema-blind fixture under [`simulations/fixtures`](../simulations/fixtures).
+- The dependency-free [replay tool](../tools/run_simulations.py) currently validates 16 fixtures and 86 explicit steps.
+- These traces are implemented, but they are not yet human-accepted golden behavior.
 
-## Starting trace shape
+Run the current simulations:
 
-Use this small shape for the first traces. Change it when the examples show that another distinction is needed.
-
-```yaml
-trace:
-source:
-starting_knowledge:
-input:
-steps:
-result:
-  stored:
-  returned:
-questions:
+```powershell
+python tools/run_simulations.py
 ```
 
-- `source` points back to the transcript and workflow that motivated the trace.
-- `steps` records what the outside agent, translation layer, and knowledge store each do.
-- `stored` describes the visible before-and-after knowledge state without assuming a schema.
-- `returned` records the answer, change result, clarification, or failure visible to the caller.
-- `questions` keeps undecided behavior explicit instead of filling it in with policy.
+Use `--verbose` to inspect every boundary crossing.
 
-## First simulations
+## What the first pass exposed
 
-| Workflow | Normal example | First pressure variation | What it should help us discover |
+| Workflow | Primary case | Pressure case | Main finding |
 | --- | --- | --- | --- |
-| Store an observation | Submit the observed N5 ARC setting with its source and qualification | The subject or source is incomplete | What is retained, interpreted, or left unresolved |
-| Retrieve context | Ask for the storage knowledge relevant to one N5 task | Relevant sources conflict or the requested context is too broad | How selection, uncertainty, and context limits behave |
-| Correct knowledge | Correct an earlier statement while preserving why it existed | The correction arrives before the statement it names | What correction, history, and unresolved reference mean |
-| Handle ambiguity or conflict | Submit two plausible interpretations or disagreeing sources | One source later changes or becomes more authoritative | Whether the behavior is clarification, coexistence, correction, or something else |
-| Repeat a submission | Retry after the first response is lost | The first outcome is unknown or the repeated content differs | What makes two requests the same and how uncertainty is reconciled |
-| Link and reorganize | Make one knowledge piece discoverable from several contexts | One proposed relationship is uncertain | What changes in organization without copying content |
-| Handle partial failure | Attempt one interaction that implies several related changes | Failure occurs before the final result is known | Which intermediate states are visible and recoverable |
-| Assemble an answer | Build an N5 storage explanation from several pieces | One required fact is missing or stale | What belongs in the returned narrative versus durable knowledge |
+| Record observation | `01-observation-normal` | `01-observation-missing-source` | A model can separate observation from policy, but identity and source binding must be supplied |
+| Retrieve task context | `02-context-normal` | `02-context-incomplete-coverage` | Relevance ranking is plausible; safety-critical completeness requires explicit coverage reporting |
+| Correct a reading | `03-correction-normal` | `03-correction-ambiguous-target` | Semantic correction is possible only after an exact target and history are available |
+| Preserve conflict | `04-conflict-normal` | `04-conflict-unsupported-winner` | Comparing sources is semantic work; choosing a winner requires decisive evidence or an explicit rule |
+| Retry a submission | `05-retry-prior-outcome` | `05-retry-indeterminate` | Retry safety is a durable protocol problem, not an LLM inference problem |
+| Link and reorganize | `06-link-normal` | `06-link-ambiguous-context` | The model can propose discovery paths; endpoints and durable outcomes must come from tools |
+| Handle partial effects | `07-invalid-target-no-effects` | `07-interrupted-partial-outcome` | Generic success/failure is insufficient; every effect and unknown outcome must be observable |
+| Answer erase safety | `08-erase-not-established` | `08-erase-supported-no-action` | The model can follow a stored evidence chain; missing retained success cannot be inferred from elapsed activity |
 
-Add a scenario only when it exposes behavior that these examples do not. A pressure variation records the result we currently expect and the reason; it does not silently turn that expectation into permanent policy.
+## What the replay tool checks
 
-## What review should leave behind
+- Every step names the actor performing it.
+- Every required information token is already held by that actor or available to the durable side.
+- Information can cross only L→T, T→R, R→T, or T→L; the outside caller cannot bypass the translation layer.
+- A participant cannot send information it never received or derived.
+- Only the durable side can add or remove durable tokens.
+- Expected returned, durable, and forbidden tokens match the candidate trace.
 
-- The trace and its source links.
-- Any correction to the written workflow.
-- Candidate words, distinctions, operations, or states that the trace actually required.
-- Questions the trace could not settle.
-- A concrete behavior that future architecture candidates can demonstrate or fail.
+The fixture items are deliberately opaque. The runner has no entity model, claim schema, relation vocabulary, database query, API, or universal lifecycle.
 
-## Later reference harness
+## What remains unproven
 
-After the Markdown traces stabilize enough to repeat:
+- Whether a real model makes each semantic distinction reliably.
+- Whether real retrieval finds the required material with useful latency and coverage.
+- Whether the candidate knowledge organization generalizes outside these N5-grounded examples.
+- The correct source-retention behavior when interpretation fails.
+- Authorization, concurrency, durability, atomicity, idempotency, and recovery mechanisms.
+- Whether any candidate state names deserve to become a state machine.
 
-- Give each accepted trace a faithful machine-readable counterpart.
-- Hold only enough in-memory state to replay the trace; do not treat it as the production schema.
-- Record the proposed actions, resulting state change, and returned result.
-- Repeat, reorder, or interrupt actions where the written pressure variations call for it.
-- Compare the observed result with the reviewed trace and report the first meaningful difference.
-- Keep model interpretation tests separable from state-transition tests when that separation helps explain a failure.
+## Review loop
 
-The harness is disposable. Its job is to make the expected interactions executable, not to choose the database, ontology, API, component names, or deployment shape.
+1. Review each [interaction trace](interaction-traces.md) against the verbatim transcript.
+2. Correct the trace before correcting its fixture.
+3. Change the fixture to match the reviewed trace and run the replay.
+4. Add a new case only when it exposes behavior the existing primary and pressure cases do not.
+5. Record distinctions that repeat across unrelated domains.
+6. Test a real translation model separately from deterministic state or protocol behavior.
+7. Compare architecture candidates only after the traces are stable enough to serve as observable acceptance examples.
 
-## Decision point
+## Candidate implementation comparison
 
-Architecture work can begin when the reviewed traces make the expected interactions concrete enough to compare candidate designs against them. There is no fixed trace count or preselected state model. Unresolved questions become explicit tests for the candidate designs rather than being hidden by a technology choice. ([T061](../source/origin-conversation-verbatim.md#t061---user))
+A future candidate can emit the same observable information transfers and durable outcomes. An adapter can normalize those events to the opaque fixture tokens, then compare them with the reviewed trace. This keeps the behavior examples stable while allowing the database, retrieval method, model, tool surface, and deployment shape to change.
+
+The fixtures are disposable. Their purpose is to expose hidden context and expected outcomes, not to become the production data model.
