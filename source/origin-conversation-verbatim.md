@@ -3,8 +3,8 @@
 This is the complete canonical human/assistant conversation captured from the original Codex session through the recorded cutoff. Message bodies are unchanged. Headings and timestamps are the only additions.
 
 - Session: `019f746d-2d62-7c90-9326-fd89d3be29f7`
-- Cutoff: `2026-07-18T10:12:40.761Z`
-- Canonical entries: 74
+- Cutoff: `2026-07-18T11:43:41.673Z`
+- Canonical entries: 98
 - Extraction details: [provenance.md](provenance.md)
 
 ## T001 - User
@@ -1834,4 +1834,417 @@ Implement the plan.
 `2026-07-18T10:12:40.761Z`
 
 I’m implementing this from the recovered root session, not the compacted summary. I’ll freeze the source immediately after this message, create the public repository, generate and verify the verbatim transcript—including the questionnaire response and rollback/replay anomaly—then build the concise derived documents and open the required ready-for-review PR.
+
+## T075 - Assistant
+
+`2026-07-18T10:13:31.449Z`
+
+The public repository now exists and the review branch is ready. I’ve frozen the source boundary at `2026-07-18T10:12:40.761Z`, immediately after my implementation acknowledgement, so later implementation chatter cannot leak into or shift the origin transcript.
+
+## T076 - Assistant
+
+`2026-07-18T10:15:30.839Z`
+
+The source capture is complete and independently checked: 74 canonical transcript entries, two rolled-back/replayed duplicates documented rather than silently repeated, the exact repository questionnaire response included, and transcript/provenance checksums valid. I’m committing that evidence layer before deriving anything from it.
+
+## T077 - Assistant
+
+`2026-07-18T10:18:02.687Z`
+
+The immutable layer is committed as its own coherent change. I’m now deriving the overview, correction history, goals, worked flows, and simulation method directly against the transcript anchors; the key review test is that rejected assistant ideas remain visibly rejected instead of being laundered into requirements.
+
+## T078 - Assistant
+
+`2026-07-18T10:22:59.749Z`
+
+The derived set is now assembled. It preserves the most important evolution: human rendering was initially considered, then explicitly deprioritized; graph-aware outside agents were rejected; the narrow internal translation role was accepted; and every database, ontology, API, and state name remains a hypothesis until the scenarios justify it. I’m in the verification pass now.
+
+## T079 - Assistant
+
+`2026-07-18T10:25:33.432Z`
+
+The final local checks are clean: the transcript regenerates to the same hashes, all 74 anchors are sequential, all derived references resolve, eight Mermaid flows are structurally balanced, local links resolve, and the public content contains no obvious secret-value patterns. I’m pushing the three commits now and opening the non-draft PR.
+
+## T080 - Assistant
+
+`2026-07-18T10:27:12.207Z`
+
+PR #1 is open and ready for review with the three intended commits. GitGuardian has passed; Kilo and CodeRabbit are still reviewing, so I’m staying with it until those checks settle and will address any concrete findings.
+
+## T081 - Assistant
+
+`2026-07-18T10:29:59.679Z`
+
+The two automated reviewers are still pending rather than failing. While they run, I’ve started an independent content audit focused on the exact risks you called out: wrong transcript interpretation, rejected ideas reappearing as requirements, provisional states sounding settled, and unsupported prior-work claims.
+
+## T082 - Assistant
+
+`2026-07-18T10:32:34.907Z`
+
+The implementation is already in the new public repo and PR. The review bots caught a few legitimate transcript-export reproducibility bugs—working-directory dependence, timestamp parsing, rollback depth, and Windows line endings—so I’m fixing those before calling it finished.
+
+## T083 - Assistant
+
+`2026-07-18T10:33:08.707Z`
+
+I’ve confirmed every inline review item. I’m also taking the two documentation findings: the README needs source anchors/checksum discovery, and the retry workflow needs to distinguish “no receipt” from “definitely never committed.” Those are intent-preserving corrections, not architecture expansion.
+
+## T084 - Assistant
+
+`2026-07-18T10:35:41.459Z`
+
+The independent content audit found a few more real inconsistencies: two Mermaid parse failures, provisional lifecycle diagrams that looked falsely linear, a trace template that froze vocabulary too early, and private prototype links in a public research note. I’m correcting those without adding product architecture.
+
+## T085 - Assistant
+
+`2026-07-18T10:37:22.626Z`
+
+One audit caught a fidelity issue that matters: the first source message contains an actual CRLF pair. Normalizing the whole Markdown made the words identical but not the stored text exact. I’m changing the exporter and Git attributes so generated headings stay LF while source message bodies retain their original characters byte-for-byte.
+
+## T086 - Assistant
+
+`2026-07-18T10:40:51.343Z`
+
+The last audit is exactly the entrenchment risk you warned about. Several workflow examples still smuggled assistant-proposed transaction, retry-ID, revision, and atomicity mechanics in as conclusions. I’m converting those to observable behaviors and explicit questions while keeping the failure cases concrete.
+
+## T087 - Assistant
+
+`2026-07-18T10:44:28.954Z`
+
+The durable source now has an independently verified 74/74 exact-body match in session order, including the original mixed line endings and both rollback/replay exclusions. I’m doing the last render/checksum/Git-object checks now, then I’ll commit, push, and clear the review threads.
+
+## T088 - Assistant
+
+`2026-07-18T10:46:14.542Z`
+
+The corrective commit is pushed. It preserves the exact stored message bodies, makes export location/timestamps/rollbacks/checksums reproducible, renders all eight Mermaid flows successfully, and removes the assistant-proposed mechanics that were starting to harden into requirements. I’m resolving the addressed review threads and waiting for the refreshed PR checks.
+
+## T089 - Assistant
+
+`2026-07-18T10:51:10.786Z`
+
+Implemented and review-ready.
+
+- Public repo: [KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE](https://github.com/Coldaine/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE)
+- Approved PR: [#1](https://github.com/Coldaine/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/pull/1)
+- [Verbatim transcript](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md): 74/74 bodies verified exactly in order; two rolled-back duplicates documented and excluded.
+- [README and documentation route](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/README.md): intent, corrections, requirements, eight workflow diagrams, provisional behavior model, simulations, and research basis.
+- Exporter is reproducible across working directories and preserves original line endings.
+- No database, schema, ontology, or assistant-invented transaction mechanics were entrenched.
+- All eight Mermaid diagrams render.
+- CodeRabbit, Kilo, and GitGuardian pass.
+- All 12 review threads are resolved; PR is approved and mergeable.
+- Four coherent commits; working tree is clean and pushed.
+
+<oai-mem-citation>
+<citation_entries>
+MEMORY.md:397-397|note=[prior graph ingestion rollout pointer]
+MEMORY.md:419-420|note=[prior agent facing graph intent]
+</citation_entries>
+<rollout_ids>
+019f543e-52ba-7840-82ff-eb8a217f0bef
+</rollout_ids>
+</oai-mem-citation>
+
+## T090 - User
+
+`2026-07-18T11:23:20.904Z`
+
+Okay, can you go through and say Latin with me? When we went through that transcript, what were the 10 most important bulleted requirements that I instructed you on, and then can you describe how you complied with them?
+
+## T091 - Assistant
+
+`2026-07-18T11:23:30.849Z`
+
+I’ll ground this directly in the verbatim transcript—not the implementation summary—and separate what you explicitly required from ideas the assistant proposed. Then I’ll map each requirement to concrete repository evidence and call out anything only partially satisfied.
+
+## T092 - Assistant
+
+`2026-07-18T11:26:53.906Z`
+
+Plainly: I complied with the preservation and design-spike requirements. I did not build the actual knowledge backend, translation service, golden-trace suite, or executable harness. I should not imply otherwise.
+
+1. **Use the complete verbatim transcript—not the compacted summary—as primary evidence.** ([T061](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:1527), [T069](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:1696))
+
+   **Complete.** The repository contains all 74 canonical visible conversation entries through the cutoff, including the interactive questionnaire. Exact bodies, rollback/replay exclusions, multipart-message handling, provenance, checksums, and the reproducible exporter are documented in [provenance.md](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/provenance.md:5).
+
+2. **Discover behavior before selecting architecture or writing product code. Do not entrench early guesses.** ([T061](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:1527), [T063](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:1549))
+
+   **Partially complete.** I produced the overview, requirements, eight fictional workflows and diagrams, provisional behavior model, and [simulation plan](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/docs/simulation-plan.md:1). I deliberately selected no database, ontology, API, or permanent state model. The separate golden traces and executable harness remain unbuilt.
+
+3. **Put the semantic intelligence inside the knowledge boundary, separate from the outside work agent.** ([T055](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:1252))
+
+   **Complete for the design spike.** The documents consistently separate a broadly capable work agent from an internal translation layer and knowledge store. Every diagram uses that interaction model. No runtime service exists yet.
+
+4. **Treat the internal role as a bidirectional translation layer—not a retrieval-oriented “knowledge agent.”** It must support encoding, organizing, storing, correcting, and retrieving. ([T059](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:1464), [T061](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:1527))
+
+   **Complete for the spike.** [overview.md](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/docs/overview.md:15) explicitly makes this correction. The workflows exercise ingestion, retrieval, correction, conflict, repetition, organization, partial failure, and contextual assembly.
+
+5. **Keep that layer narrow, stateless, fast, and clean-context, with knowledge-only tools; leave the outside agent broadly capable.** ([T055](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:1252), [T057](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:1372))
+
+   **Complete as a behavioral requirement.** It is captured in [goals-and-requirements.md](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/docs/goals-and-requirements.md:27) and the provisional roles. I did not prematurely choose a model, prompt, API, or tool implementation.
+
+6. **Mediate knowledge interaction through controlled tools so agents cannot freeform malformed writes, while allowing stronger enforcement inside that boundary.** ([T046](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:791), [T059](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:1464))
+
+   **Captured, not implemented.** The work agent remains structure-blind and the translation layer owns knowledge interaction. Exact tools, validation rules, transaction behavior, and enforcement mechanics are explicitly left for simulations instead of being invented now.
+
+7. **Use reusable, addressable knowledge pieces linked across contexts rather than making one document own and duplicate a fact.** ([T043](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:699), [T046](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:791))
+
+   **Complete for the spike.** This is a primary goal and has its own link-and-reorganize scenario in [workflows.md](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/docs/workflows.md:237). No graph or storage representation was selected, and automatic linking is not yet implemented.
+
+8. **Make it agent-first. Do not spend this phase building a human renderer or CMS.** ([T051](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:1115))
+
+   **Complete.** The documents explicitly make human rendering secondary. Nothing was built for rendering or publishing.
+
+9. **Do not force every knowledge piece into a universal field-heavy record or expose metadata/front matter by default.** ([T046](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:791))
+
+   **Complete as a requirement.** The goals call for variable-shaped knowledge and concise task-specific results. No universal schema or ontology was introduced, so this has not yet been runtime-tested.
+
+10. **Move this into a durable, public, plainly written Markdown repository with the memorable exact name; preserve the full source but focus derivation on the knowledge system. Avoid giant invented guardrails.** ([T063](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:1549), [T066](C:/_projects/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/source/origin-conversation-verbatim.md:1575))
+
+   **Complete.** The public repository is [KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE](https://github.com/Coldaine/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE), with an approved [PR #1](https://github.com/Coldaine/KNOWLEDGECRITICALSTRUCTUREPATRICKPLEASE/pull/1). The N5 discussion remains in the source and motivates examples, while derived documents focus on the knowledge system. During review, I specifically removed premature transaction, retry-ID, state, and enforcement rules that had begun to look like settled requirements.
+
+The main unfinished requirement is therefore number 2’s later half: reviewed golden traces, pressure-test results, and the executable reference harness. Everything describing the eventual runtime system remains documentation and behavioral hypotheses—not working software.
+
+## T093 - User
+
+`2026-07-18T11:38:23.201Z`
+
+Okay, but did you actually analyze the transcript and look at the things that I said I wanted? The thing you had to do was think through each task I had assigned and think through whether you did it. Did you understand what I wanted, and did you learn anything as you went down some of this? You should have sort of more understood what I was talking about and what sort of things were
+
+## T094 - Assistant
+
+`2026-07-18T11:38:35.577Z`
+
+You’re right. My last answer was mostly a requirements-to-files audit. It proved traceability, but it did not really reason through the sequence of tasks you gave me, how your corrections changed the model, or what I learned from the N5 discussion that caused the knowledge-system idea to emerge.
+
+I’m going back through the conversation chronologically now and will answer three things plainly: what you were trying to accomplish, what I actually did for each assigned task, and where my understanding changed or is still incomplete.
+
+## T095 - Assistant
+
+`2026-07-18T11:43:16.287Z`
+
+No—not adequately in my last answer.
+
+I had read the transcript, but I answered like an auditor: extract ten requirements, point to ten files, declare compliance. You were asking whether I understood the sequence of work, your corrections, what remained unfinished, and what the N5 investigation taught us. I did not answer that.
+
+## What you were actually talking about
+
+The N5 discussion was not incidental background. It demonstrated the knowledge problem:
+
+- `zfs_arc_max=2 GiB` was an observed configuration—not proof that 2 GiB was correct, required, or causing the slowness. I initially blurred those categories until you corrected me.
+- “The copy is running,” “the copy exited successfully,” and “the destination was independently verified” are different claims.
+- One storage fact belongs simultaneously to N5, the storage domain, a migration operation, performance analysis, and a future decision. Moving it between Markdown folders does not solve that.
+- The 27-million-file backup layout showed that the relevant answer was not another ZFS cache setting. The data’s shape was the problem.
+- A document can quietly turn an old observation or assistant proposal into apparent authority. You want a system that preserves what something means, where it came from, how current it is, and how it relates to other knowledge.
+
+So the actual goal is not “better documentation,” “GraphRAG,” or a graph-backed note system. It is a personal operational knowledge-and-decision substrate.
+
+The graph might eventually be storage. Documents might eventually be projections. Neither is the product.
+
+The product boundary you identified is:
+
+```text
+Outside work agent
+  broad tools
+  messy task context
+  investigates and acts
+          |
+          | plain-language question, evidence, correction, or intent
+          v
+Internal translation layer
+  clean per-request context
+  knowledge-only tools
+  interprets both reads and writes
+  organizes and reconciles meaning
+          |
+          v
+Durable knowledge backend
+```
+
+The important things are not primarily nodes and fields. They are distinctions such as:
+
+- observed versus decided;
+- configured versus required;
+- source versus interpretation;
+- current versus historical;
+- correction versus conflict;
+- stored knowledge versus temporary task context;
+- established outcome versus unknown outcome;
+- content versus its organization across contexts.
+
+## What I actually did with each assigned task
+
+I am grouping closely related follow-ups together. This is what the transcript shows, not a claim about N5’s current state today.
+
+1. **Identify what was hammering the N5 drives and whether it was dangerous.**
+
+   Completed. I inspected the live host, found two overlapping checksum/dry-run `rsync` trees, verified they were reading rather than writing, checked pools, temperatures, and SMART indicators, and separated that activity from scrubs, backups, and the running inference container.
+
+2. **Stop the redundant operation.**
+
+   Completed. After you authorized it, I terminated one redundant process tree and verified the checksum comparison remained read-only and active.
+
+3. **Estimate its remaining time and determine whether completion would prove the migration.**
+
+   Only partially completed. I estimated roughly four hours remaining, but then discovered the job had been piped through `head`, its output went to a dead pipe, and neither a trustworthy full difference log nor final status would survive.
+
+   The correct conclusion was: that invocation could not establish final verification. Within this transcript, a properly logged replacement verification was never completed.
+
+4. **Explain why verification took nearly as long as copying, whether it was justified, and how to make the original copy auditable.**
+
+   The explanation was completed. A checksum comparison must read every source byte and every destination byte; HDDs still perform a second complete data pass even though nothing is written.
+
+   I supplied commands for durable copy logging, metadata comparison, and checksum verification. But I did not turn that into completed migration evidence or a proven runbook execution. Explanation: done. Operational closure: not done.
+
+5. **Explain the mechanics and danger of adding the fourth disk to RAIDZ.**
+
+   Completed as an explanation. I separated:
+
+   ```text
+   ext4 source → copy into existing RAIDZ → verify → erase source
+               → attach empty disk → in-place RAIDZ expansion
+   ```
+
+   I verified that N5’s OpenZFS version and feature state supported expansion. The important risk was surrendering the independent source, not some hidden file-level copy back onto the same disk.
+
+6. **Understand why the HDD pool felt intolerably slow and what would materially improve it.**
+
+   Completed as a diagnosis. The crucial learning came only after you challenged the ARC answer.
+
+   Live measurements showed metadata was already mostly cached, CPU was idle, and the pool was performing huge numbers of tiny reads at only a few MiB/s. The real pathology was approximately 27 million loose filesystem entries—not insufficient ARC, L2ARC, SLOG, or checksum CPU.
+
+7. **Investigate the strange file-store configuration and whether the tiny files should be repackaged.**
+
+   Completed only as analysis.
+
+   I established that “1 MiB” meant ZFS `recordsize`, not a target file size. I recommended indexed, deduplicated packfiles for backup trees, NVMe-resident catalogs/indexes, and separate handling for the `ddrescue` image.
+
+   No packaging format was selected, no archive was converted, and no restore was tested.
+
+8. **Investigate duplicate backups.**
+
+   Preliminary work only.
+
+   I found at least 20 copied Btrfs snapshot trees whose reflink sharing had likely been materialized by `rsync`, plus a Windows tree containing substantial reconstructible material and some obvious repeated logs.
+
+   I did not perform the complete overlap/hash analysis, inspect all image contents, repackage anything, prove representative restores, or delete anything.
+
+9. **Determine whether NVMe sidecars, ARC, L2ARC, SLOG, or a special vdev would help without stealing inference resources.**
+
+   Completed as advice.
+
+   The conclusion was:
+
+   - ARC increase: not meaningful for this one-pass workload.
+   - L2ARC: not meaningful for the first cold read.
+   - SLOG: irrelevant to read-heavy checksum work.
+   - Special vdev: potentially useful for a permanent loose-file workload, but pool-critical and premature.
+   - Separate NVMe metadata/index storage: useful without coupling `tank` to a special vdev.
+   - Repackaging: the highest-value fix.
+
+   No hardware or pool configuration was changed.
+
+10. **Assess whether the documentation guide and N5 storage ownership were themselves wrong.**
+
+    Diagnosed, not changed.
+
+    I first proposed a better domain-first directory structure. Your next correction was the important one: moving facts between `architecture/storage.md` and `reference/n5.md` still leaves documents owning and duplicating knowledge.
+
+    The homelab documentation guide was not redesigned in this work.
+
+11. **Understand and preserve the actual knowledge-system model.**
+
+    I eventually understood it, but only after several wrong abstractions:
+
+    - I proposed cards, YAML, schemas, and generated documents too early.
+    - I then proposed two-sided GraphRAG and overemphasized rendering.
+    - I then called it an agent-memory backend, still emphasizing retrieval.
+    - I placed graph intelligence in the outside work agent.
+    - I called the internal role a knowledge agent, which again biased it toward retrieval.
+    - I invented transaction and enforcement mechanics before simulations justified them.
+
+    Your corrections produced the actual model: an agent-first, bidirectional, database-side semantic translation boundary responsible for encoding, organization, storage, correction, retrieval, and controlled mutation.
+
+12. **Preserve the corpus and begin the behavior-first design spike.**
+
+    Partially completed overall.
+
+    Completed:
+
+    - Public durable repository.
+    - Verbatim source and provenance.
+    - Intent and correction record.
+    - Goals and reasons.
+    - Eight primitive workflows.
+    - Eight rendered sequence diagrams.
+    - Provisional behavior vocabulary.
+    - Research comparison.
+    - Simulation and harness plan.
+
+    Not completed:
+
+    - Your review and acceptance of the eight workflows.
+    - Actual golden traces.
+    - Recorded mini-simulation results.
+    - Adversarial runs for ambiguity, conflict, reordering, repetition, and partial failure.
+    - States derived from accepted simulation evidence.
+    - Executable reference harness.
+    - Runtime translation service or knowledge backend.
+
+## What I learned
+
+The most important lesson was not “use a graph.”
+
+It was that the system must prevent evidence from being laundered into the wrong epistemic category. The ARC mistake is the cleanest example:
+
+```text
+Observed: N5 currently has a 2 GiB ARC cap.
+```
+
+does not imply:
+
+```text
+Decision: 2 GiB is the desired allocation.
+Requirement: inference requires this cap.
+Diagnosis: the cap causes the current slowness.
+```
+
+A useful knowledge backend must preserve those as different things.
+
+I also learned:
+
+- Document ownership is the wrong primary abstraction. One knowledge piece needs multiple contextual paths without multiple maintained copies.
+- Retrieval is not the hard or distinctive half. Interpretation, encoding, correction, reconciliation, and organization are.
+- General work agents should not each become unreliable ontology and graph clients.
+- Putting a narrow translation layer beside the data creates consistent semantics, clean context, restricted capabilities, and a place for stronger enforcement.
+- Metadata must remain accessible without being dumped into normal agent context.
+- Human-readable documents can remain a future projection, but rendering is not the current product.
+- My own tendency is to convert a plausible example into an architecture too quickly.
+
+That last lesson showed up while implementing the repository. The first version quietly entrenched retry identities, transaction records, atomicity, a large trace schema, eighteen scenarios, and a hard architecture gate. Those came from assistant proposals, not from you. The review forced me to remove or relabel them as questions and hypotheses.
+
+There is one further uncomfortable truth: the provisional behavior model may itself be ahead of your requested sequence. It was derived from assistant-authored workflows before you reviewed them and before actual traces were run. Calling it provisional helps, but it is not yet evidence that those are the right states.
+
+So: by the end of the conversation, I believe I understood the conceptual direction. I did not understand it at the beginning, and the repository does not prove the model is right. It preserves the reasoning well enough for us to test it.
+
+The next honest step is not more architecture. It is to take the eight workflows one at a time with you, decide whether each tells the interaction you meant, correct them, and only then turn the accepted versions into actual simulation traces and a harness.
+
+## T096 - User
+
+`2026-07-18T11:43:17.276Z`
+
+And then the fictional workflows, right? It's just step by step. Do you believe that an agent would be able to do those intermediate steps? Is the information from that supplied by the information, organized well? Do you think it'd be easy to retrieve? Did you think about what kind of information comes right and left?
+
+## T097 - Assistant
+
+`2026-07-18T11:43:28.120Z`
+
+That is the right criticism. A sequence diagram saying “resolve subjects,” “inspect related knowledge,” or “assemble context” does not establish that an agent could actually do it. I need to audit each workflow for four things: exact inbound information, required intermediate reasoning, retrievable stored information, and exact outbound information. I’ll distinguish steps that are plausible now from steps that are hand-waving.
+
+## T098 - User
+
+`2026-07-18T11:43:41.673Z`
+
+What the fuck are you talking about? Are you talking about that those were the mock tests? How does that have anything to do with what the fuck? Didn't we spend like 20 minutes in the most important knowledge structure? What are you doing? Focus on that. Have you somehow lost the thread here? I guess what I need to do is just dump all that stuff right back into you because you feel that you understood the importance of it back then, but now you don't see. Do it all.
 

@@ -4,11 +4,11 @@
 
 - Session ID: `019f746d-2d62-7c90-9326-fd89d3be29f7`
 - Source file: `rollout-2026-07-18T03-52-20-019f746d-2d62-7c90-9326-fd89d3be29f7.jsonl`
-- Cutoff timestamp: `2026-07-18T10:12:40.761Z`
-- Raw user/assistant message records through cutoff: 74
+- Cutoff timestamp: `2026-07-18T11:43:41.673Z`
+- Raw user/assistant message records through cutoff: 98
 - Rolled-back conversation entries excluded from the canonical conversation: 2
 - Interactive prompt/response records included: 2
-- Canonical transcript entries: 74
+- Canonical transcript entries: 98
 
 ## Inclusion rules
 
@@ -47,5 +47,5 @@ Run from the repository root:
 ~~~powershell
 ./tools/export-origin-transcript.ps1 `
   -SessionPath '<path-to-session-jsonl>' `
-  -CutoffTimestamp '2026-07-18T10:12:40.761Z'
+  -CutoffTimestamp '2026-07-18T11:43:41.673Z'
 ~~~
