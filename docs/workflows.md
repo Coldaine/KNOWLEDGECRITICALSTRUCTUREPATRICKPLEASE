@@ -1,6 +1,8 @@
-# Workflow simulations
+# Workflow catalog
 
-These examples describe behavior to pressure-test before choosing an architecture. Every step and expected result is a starting hypothesis that the traces may correct. They do not select a database, schema, ontology, API, or permanent name for the internal layer.
+These stories name behavior to pressure-test before choosing an architecture. They are not executable simulations: the original versions hid the difficult information dependencies inside verbs such as “resolve,” “retrieve,” “interpret,” and “assemble.” The [candidate interaction traces](interaction-traces.md) now expand every story into explicit left/right payloads, reasoning prerequisites, durable effects, and feasibility limits. The [information-flow model](information-flow.md) explains the shared boundary.
+
+Every step and expected result below remains a starting hypothesis. Nothing here selects a database, schema, ontology, API, or permanent name for the internal layer.
 
 References such as `T055` point to the stable entries in the [verbatim origin conversation](../source/origin-conversation-verbatim.md).
 
