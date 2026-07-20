@@ -1,0 +1,176 @@
+{
+  "id": "08-erase-not-established",
+  "title": "Return not established when verification success evidence is missing",
+  "basis": ["T013-T024", "T043-T052", "T055-T061", "interaction-trace-8"],
+  "feasibility": "conditional",
+  "items": {
+    "request.can-erase-fourth-disk": "The caller asks whether the fourth disk may now be erased and added to tank",
+    "scope.n5-migration": "The request is scoped to the N5 migration",
+    "time.as-of-request": "The caller supplies the decision time",
+    "budget.bounded": "The caller requests a bounded answer with blockers and evidence",
+    "rule.read-only-no-world-action": "The translation layer can answer but cannot erase a disk or alter a pool",
+    "query.resolve-disk-pool": "A bounded identity request for tank and the fourth migration disk",
+    "store.entity.tank": "The unique tank pool",
+    "store.entity.fourth-disk": "The unique protected migration-source disk",
+    "coverage.identity-unique": "The pool and disk resolve uniquely in migration scope",
+    "query.erase-preconditions": "A request for topology, role, copy state, safety rule, verification, sources, and coverage",
+    "store.topology.current": "Current topology shows the disk outside tank",
+    "store.disk-role.independent-source": "The disk remains the independent migration source",
+    "store.copy.completed": "The copy operation completed",
+    "store.safety.verify-before-erase": "The stored destructive precondition requires successful retained verification evidence",
+    "store.verification.read-ran": "A checksum read is known to have run",
+    "store.verification.no-retained-success": "No retained successful result and exit status or equivalent proof is established",
+    "store.currentness.topology": "The topology evidence has an explicit observation time and freshness standing",
+    "store.source.topology": "A source pointer for the current topology and disk role",
+    "store.source.copy": "A source pointer for the completed copy state",
+    "store.source.verification": "A source pointer for the verification attempt and missing retained result",
+    "store.risk.remaining-expansion": "The stored remaining risk that erase and expansion are separate world actions",
+    "coverage.erase-categories-complete": "Every requested category and source drill-down was searched without truncation",
+    "meaning.precondition-gap": "The layer finds that a read event does not satisfy the stored verification-success precondition",
+    "response.erase-not-established": "The caller receives not established, the blocking evidence gap, and no-action notice",
+    "durable.generated-safety-answer": "The generated answer was stored as canonical knowledge",
+    "world.disk-erased": "The fourth disk was erased",
+    "world.disk-added-to-tank": "The fourth disk was added to tank"
+  },
+  "initial": {
+    "outside": ["request.can-erase-fourth-disk", "scope.n5-migration", "time.as-of-request", "budget.bounded"],
+    "layer": ["rule.read-only-no-world-action"],
+    "store": [],
+    "durable": [
+      "store.entity.tank",
+      "store.entity.fourth-disk",
+      "store.topology.current",
+      "store.disk-role.independent-source",
+      "store.copy.completed",
+      "store.safety.verify-before-erase",
+      "store.verification.read-ran",
+      "store.verification.no-retained-success",
+      "store.currentness.topology",
+      "store.source.topology",
+      "store.source.copy",
+      "store.source.verification",
+      "store.risk.remaining-expansion"
+    ]
+  },
+  "steps": [
+    {
+      "id": "submit-question",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send the destructive-boundary question, scope, time, and desired answer shape",
+      "requires": ["request.can-erase-fourth-disk", "scope.n5-migration", "time.as-of-request", "budget.bounded"],
+      "send": [{"to": "layer", "items": ["request.can-erase-fourth-disk", "scope.n5-migration", "time.as-of-request", "budget.bounded"]}]
+    },
+    {
+      "id": "request-identities",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Turn the relative disk phrase into a bounded identity question within migration scope",
+      "requires": ["request.can-erase-fourth-disk", "scope.n5-migration", "time.as-of-request"],
+      "derive": ["query.resolve-disk-pool"],
+      "send": [{"to": "store", "items": ["query.resolve-disk-pool", "scope.n5-migration", "time.as-of-request"]}]
+    },
+    {
+      "id": "return-identities",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return a unique disk and pool with match status",
+      "requires": ["query.resolve-disk-pool", "store.entity.tank", "store.entity.fourth-disk"],
+      "derive": ["coverage.identity-unique"],
+      "send": [{"to": "layer", "items": ["store.entity.tank", "store.entity.fourth-disk", "coverage.identity-unique"]}]
+    },
+    {
+      "id": "request-preconditions",
+      "actor": "layer",
+      "mode": "lookup",
+      "note": "Request every category needed to evaluate the stored destructive precondition",
+      "requires": ["store.entity.tank", "store.entity.fourth-disk", "coverage.identity-unique", "time.as-of-request"],
+      "derive": ["query.erase-preconditions"],
+      "send": [{"to": "store", "items": ["query.erase-preconditions", "store.entity.tank", "store.entity.fourth-disk", "time.as-of-request"]}]
+    },
+    {
+      "id": "return-preconditions",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return current topology, role, copy state, the safety rule, verification evidence, and complete coverage",
+      "requires": [
+        "query.erase-preconditions",
+        "store.topology.current",
+        "store.disk-role.independent-source",
+        "store.copy.completed",
+        "store.safety.verify-before-erase",
+        "store.verification.read-ran",
+        "store.verification.no-retained-success",
+        "store.currentness.topology",
+        "store.source.topology",
+        "store.source.copy",
+        "store.source.verification",
+        "store.risk.remaining-expansion"
+      ],
+      "derive": ["coverage.erase-categories-complete"],
+      "send": [{
+        "to": "layer",
+        "items": [
+          "store.topology.current",
+          "store.disk-role.independent-source",
+          "store.copy.completed",
+          "store.safety.verify-before-erase",
+          "store.verification.read-ran",
+          "store.verification.no-retained-success",
+          "store.currentness.topology",
+          "store.source.topology",
+          "store.source.copy",
+          "store.source.verification",
+          "store.risk.remaining-expansion",
+          "coverage.erase-categories-complete"
+        ]
+      }]
+    },
+    {
+      "id": "evaluate-evidence-chain",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Compare explicit verification evidence with the explicit stored precondition",
+      "requires": [
+        "store.topology.current",
+        "store.disk-role.independent-source",
+        "store.copy.completed",
+        "store.safety.verify-before-erase",
+        "store.verification.read-ran",
+        "store.verification.no-retained-success",
+        "store.currentness.topology",
+        "store.source.topology",
+        "store.source.copy",
+        "store.source.verification",
+        "store.risk.remaining-expansion",
+        "coverage.erase-categories-complete",
+        "rule.read-only-no-world-action"
+      ],
+      "derive": ["meaning.precondition-gap"]
+    },
+    {
+      "id": "return-not-established",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Return the missing retained-success evidence as the blocker and perform no action",
+      "requires": [
+        "meaning.precondition-gap",
+        "store.verification.no-retained-success",
+        "store.source.topology",
+        "store.source.copy",
+        "store.source.verification",
+        "store.risk.remaining-expansion",
+        "rule.read-only-no-world-action"
+      ],
+      "derive": ["response.erase-not-established"],
+      "send": [{"to": "outside", "items": ["response.erase-not-established"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.erase-not-established"]},
+    "not_has": {"durable": ["durable.generated-safety-answer", "world.disk-erased", "world.disk-added-to-tank"]},
+    "durable_added": [],
+    "durable_removed": [],
+    "response": "response.erase-not-established"
+  }
+}

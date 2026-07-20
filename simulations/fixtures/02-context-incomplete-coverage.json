@@ -1,0 +1,73 @@
+{
+  "id": "02-context-incomplete-coverage",
+  "title": "Expose conflicting topology and truncated safety retrieval",
+  "basis": ["T046-T052", "T055-T060", "interaction-trace-2-pressure"],
+  "feasibility": "conditional",
+  "items": {
+    "request.diagnose-disk-activity": "The caller requests N5 investigation context",
+    "scope.n5-storage": "The request is scoped to N5 storage",
+    "time.as-of-request": "The caller supplies an as-of time",
+    "budget.too-small": "The response budget cannot cover every required category",
+    "query.task-categories": "A request for topology, activity, safety, operations, and sources",
+    "store.topology.claim-a": "One sourced current-topology candidate",
+    "store.topology.claim-b": "A conflicting sourced current-topology candidate",
+    "coverage.topology-conflicted": "The store reports that current topology is conflicted",
+    "coverage.safety-truncated": "Safety retrieval was truncated rather than empty",
+    "response.context-incomplete": "The caller is told that current topology conflicts and safety coverage is incomplete",
+    "response.confident-safe-context": "A capsule that silently presents the task as fully covered",
+    "durable.canonical-capsule": "A generated task capsule stored as canonical knowledge"
+  },
+  "initial": {
+    "outside": ["request.diagnose-disk-activity", "scope.n5-storage", "time.as-of-request", "budget.too-small"],
+    "layer": [],
+    "store": [],
+    "durable": ["store.topology.claim-a", "store.topology.claim-b"]
+  },
+  "steps": [
+    {
+      "id": "submit-task",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send the task with a budget that cannot cover all required material",
+      "requires": ["request.diagnose-disk-activity", "scope.n5-storage", "time.as-of-request", "budget.too-small"],
+      "send": [{"to": "layer", "items": ["request.diagnose-disk-activity", "scope.n5-storage", "time.as-of-request", "budget.too-small"]}]
+    },
+    {
+      "id": "request-task-material",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Ask for the task categories despite the tight budget",
+      "requires": ["request.diagnose-disk-activity", "scope.n5-storage", "time.as-of-request", "budget.too-small"],
+      "derive": ["query.task-categories"],
+      "send": [{"to": "store", "items": ["query.task-categories", "scope.n5-storage", "time.as-of-request", "budget.too-small"]}]
+    },
+    {
+      "id": "return-limited-material",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return both topology candidates and distinguish truncated safety retrieval from no safety material",
+      "requires": ["query.task-categories", "store.topology.claim-a", "store.topology.claim-b"],
+      "derive": ["coverage.topology-conflicted", "coverage.safety-truncated"],
+      "send": [{
+        "to": "layer",
+        "items": ["store.topology.claim-a", "store.topology.claim-b", "coverage.topology-conflicted", "coverage.safety-truncated"]
+      }]
+    },
+    {
+      "id": "return-incomplete",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Return explicit coverage failure instead of a confident capsule",
+      "requires": ["store.topology.claim-a", "store.topology.claim-b", "coverage.topology-conflicted", "coverage.safety-truncated"],
+      "derive": ["response.context-incomplete"],
+      "send": [{"to": "outside", "items": ["response.context-incomplete"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.context-incomplete"]},
+    "not_has": {"outside": ["response.confident-safe-context"], "durable": ["durable.canonical-capsule"]},
+    "durable_added": [],
+    "durable_removed": [],
+    "response": "response.context-incomplete"
+  }
+}

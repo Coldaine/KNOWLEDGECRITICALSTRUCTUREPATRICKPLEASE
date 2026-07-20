@@ -1,0 +1,69 @@
+{
+  "id": "05-retry-prior-outcome",
+  "title": "Return an established prior result without duplicating its effects",
+  "basis": ["T057-T060", "interaction-trace-5"],
+  "feasibility": "protocol-dependent",
+  "items": {
+    "request.retry": "The caller says the first response was lost and this is a retry",
+    "request.operation-id": "The caller supplies the same operation identity",
+    "request.content": "The repeated evidence and qualification",
+    "lookup.prior-outcome": "A request for outcome and content binding by operation identity",
+    "store.prior-operation-id": "The durable prior operation identity",
+    "store.prior-content-binding": "The exact content bound to the prior operation",
+    "store.prior-effect": "The durable effect of the prior operation",
+    "store.prior-response": "The durable prior response data",
+    "status.prior-success-exact-match": "The store establishes prior success and exact content match",
+    "response.prior-result": "The caller receives the established prior result and no-new-effect notice",
+    "durable.duplicate-effect": "A second durable copy of the prior effect"
+  },
+  "initial": {
+    "outside": ["request.retry", "request.operation-id", "request.content"],
+    "layer": [],
+    "store": [],
+    "durable": ["store.prior-operation-id", "store.prior-content-binding", "store.prior-effect", "store.prior-response"]
+  },
+  "steps": [
+    {
+      "id": "submit-retry",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send retry intent, operation identity, and repeated content",
+      "requires": ["request.retry", "request.operation-id", "request.content"],
+      "send": [{"to": "layer", "items": ["request.retry", "request.operation-id", "request.content"]}]
+    },
+    {
+      "id": "request-prior-outcome",
+      "actor": "layer",
+      "mode": "protocol",
+      "note": "Ask for the exact prior outcome and content binding rather than comparing prose semantically",
+      "requires": ["request.retry", "request.operation-id", "request.content"],
+      "derive": ["lookup.prior-outcome"],
+      "send": [{"to": "store", "items": ["lookup.prior-outcome", "request.operation-id", "request.content"]}]
+    },
+    {
+      "id": "return-prior-outcome",
+      "actor": "store",
+      "mode": "protocol",
+      "note": "Establish prior success and an exact content match",
+      "requires": ["lookup.prior-outcome", "request.operation-id", "request.content", "store.prior-operation-id", "store.prior-content-binding", "store.prior-effect", "store.prior-response"],
+      "derive": ["status.prior-success-exact-match"],
+      "send": [{"to": "layer", "items": ["store.prior-effect", "store.prior-response", "status.prior-success-exact-match"]}]
+    },
+    {
+      "id": "return-established-result",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Return the earlier result without proposing another mutation",
+      "requires": ["store.prior-effect", "store.prior-response", "status.prior-success-exact-match"],
+      "derive": ["response.prior-result"],
+      "send": [{"to": "outside", "items": ["response.prior-result"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.prior-result"], "durable": ["store.prior-effect"]},
+    "not_has": {"durable": ["durable.duplicate-effect"]},
+    "durable_added": [],
+    "durable_removed": [],
+    "response": "response.prior-result"
+  }
+}

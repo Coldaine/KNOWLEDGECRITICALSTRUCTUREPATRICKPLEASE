@@ -1,0 +1,150 @@
+{
+  "id": "04-conflict-normal",
+  "title": "Retain conflicting disk-role evidence without selecting a winner",
+  "basis": ["T022-T024", "T046-T052", "T055-T061", "interaction-trace-4"],
+  "feasibility": "conditional",
+  "items": {
+    "request.record-evidence": "The caller asks to record new disk-role evidence",
+    "target.hint.n5-tank-fourth-disk": "Plain-language target hints for N5, tank, and the fourth migration disk",
+    "evidence.new-disk-role": "A new source says the disk has already joined tank",
+    "evidence.new-source-time": "The new source includes time and scope",
+    "lookup.disk-role-context": "A bounded request for identities, competing claims, and safety conditions",
+    "store.entity.fourth-disk": "The resolved migration-source disk",
+    "store.entity.tank": "The resolved tank pool",
+    "store.claim.independent-source": "Existing sourced material says the disk is still independent",
+    "store.safety.require-role-and-verification": "Destructive reuse requires disk role and verification to be established",
+    "coverage.context-complete": "The requested competing context was fully searched",
+    "meaning.unresolved-conflict": "The two sources cover the same role but do not establish one winner",
+    "proposal.retain-new-source": "Proposed retention of the new source",
+    "proposal.record-competing-interpretation": "Proposed competing interpretation",
+    "proposal.record-conflict": "Proposed explicit conflict",
+    "proposal.record-resolution-question": "Proposed question describing evidence that could resolve the conflict",
+    "result.source-retained": "The new source-retention effect was accepted with a resulting reference",
+    "result.interpretation-retained": "The competing interpretation effect was accepted with a resulting reference",
+    "result.conflict-recorded": "The explicit conflict effect was accepted with a resulting reference",
+    "result.question-recorded": "The unresolved-question effect was accepted with a resulting reference",
+    "durable.source.new-disk-role": "Retained new source",
+    "durable.interpretation.disk-joined": "Retained competing interpretation",
+    "durable.conflict.disk-role": "Discoverable conflict between the two interpretations",
+    "durable.question.resolve-disk-role": "A stored unresolved question, not an observation",
+    "durable.winner.disk-joined": "An unsupported current winner",
+    "response.conflict-and-blocker": "The caller receives the conflict, stored safety blocker, and needed observation"
+  },
+  "initial": {
+    "outside": ["request.record-evidence", "target.hint.n5-tank-fourth-disk", "evidence.new-disk-role", "evidence.new-source-time"],
+    "layer": [],
+    "store": [],
+    "durable": ["store.entity.fourth-disk", "store.entity.tank", "store.claim.independent-source", "store.safety.require-role-and-verification"]
+  },
+  "steps": [
+    {
+      "id": "submit-evidence",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send the new source, claimed meaning, time, scope, and target hints",
+      "requires": ["request.record-evidence", "target.hint.n5-tank-fourth-disk", "evidence.new-disk-role", "evidence.new-source-time"],
+      "send": [{"to": "layer", "items": ["request.record-evidence", "target.hint.n5-tank-fourth-disk", "evidence.new-disk-role", "evidence.new-source-time"]}]
+    },
+    {
+      "id": "request-competing-context",
+      "actor": "layer",
+      "mode": "lookup",
+      "note": "Request resolved identities, competing material, and any applicable safety condition",
+      "requires": ["request.record-evidence", "target.hint.n5-tank-fourth-disk"],
+      "derive": ["lookup.disk-role-context"],
+      "send": [{"to": "store", "items": ["lookup.disk-role-context", "target.hint.n5-tank-fourth-disk"]}]
+    },
+    {
+      "id": "return-competing-context",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return identities, the older claim, the safety condition, and search coverage",
+      "requires": ["lookup.disk-role-context", "store.entity.fourth-disk", "store.entity.tank", "store.claim.independent-source", "store.safety.require-role-and-verification"],
+      "derive": ["coverage.context-complete"],
+      "send": [{"to": "layer", "items": ["store.entity.fourth-disk", "store.entity.tank", "store.claim.independent-source", "store.safety.require-role-and-verification", "coverage.context-complete"]}]
+    },
+    {
+      "id": "propose-conflict-effects",
+      "actor": "layer",
+      "mode": "semantic",
+      "note": "Preserve both interpretations and a resolution question without inventing a winner",
+      "requires": ["evidence.new-disk-role", "evidence.new-source-time", "store.entity.fourth-disk", "store.entity.tank", "store.claim.independent-source", "coverage.context-complete"],
+      "derive": ["meaning.unresolved-conflict", "proposal.retain-new-source", "proposal.record-competing-interpretation", "proposal.record-conflict", "proposal.record-resolution-question"],
+      "send": [{
+        "to": "store",
+        "items": [
+          "evidence.new-disk-role",
+          "evidence.new-source-time",
+          "store.entity.fourth-disk",
+          "store.entity.tank",
+          "store.claim.independent-source",
+          "meaning.unresolved-conflict",
+          "proposal.retain-new-source",
+          "proposal.record-competing-interpretation",
+          "proposal.record-conflict",
+          "proposal.record-resolution-question"
+        ]
+      }]
+    },
+    {
+      "id": "apply-conflict-effects",
+      "actor": "store",
+      "mode": "enforcement",
+      "note": "Retain the source, competing interpretation, conflict, and unresolved question",
+      "requires": [
+        "proposal.retain-new-source",
+        "proposal.record-competing-interpretation",
+        "proposal.record-conflict",
+        "proposal.record-resolution-question",
+        "evidence.new-source-time",
+        "store.entity.fourth-disk",
+        "store.entity.tank",
+        "store.claim.independent-source",
+        "meaning.unresolved-conflict"
+      ],
+      "derive": [
+        "result.source-retained",
+        "result.interpretation-retained",
+        "result.conflict-recorded",
+        "result.question-recorded",
+        "durable.source.new-disk-role",
+        "durable.interpretation.disk-joined",
+        "durable.conflict.disk-role",
+        "durable.question.resolve-disk-role"
+      ],
+      "persist": ["durable.source.new-disk-role", "durable.interpretation.disk-joined", "durable.conflict.disk-role", "durable.question.resolve-disk-role"],
+      "send": [{
+        "to": "layer",
+        "items": ["result.source-retained", "result.interpretation-retained", "result.conflict-recorded", "result.question-recorded"]
+      }]
+    },
+    {
+      "id": "return-conflict",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Return the unresolved conflict and the already stored destructive-action blocker",
+      "requires": [
+        "result.source-retained",
+        "result.interpretation-retained",
+        "result.conflict-recorded",
+        "result.question-recorded",
+        "store.safety.require-role-and-verification",
+        "meaning.unresolved-conflict"
+      ],
+      "derive": ["response.conflict-and-blocker"],
+      "send": [{"to": "outside", "items": ["response.conflict-and-blocker"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.conflict-and-blocker"], "durable": ["durable.source.new-disk-role", "durable.interpretation.disk-joined", "durable.conflict.disk-role", "durable.question.resolve-disk-role"]},
+    "not_has": {"durable": ["durable.winner.disk-joined"]},
+    "durable_added": [
+      "durable.source.new-disk-role",
+      "durable.interpretation.disk-joined",
+      "durable.conflict.disk-role",
+      "durable.question.resolve-disk-role"
+    ],
+    "durable_removed": [],
+    "response": "response.conflict-and-blocker"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "06-link-ambiguous-context",
+  "title": "Do not create a discovery path to an ambiguous context",
+  "basis": ["T043-T048", "T051-T052", "T055-T061", "interaction-trace-6-pressure"],
+  "feasibility": "conditional",
+  "items": {
+    "request.organize-piece": "The caller asks to link an existing piece to storage",
+    "hint.tank-geometry-piece": "A unique hint for the existing piece",
+    "hint.context.storage": "The context is named only as storage",
+    "lookup.piece-and-context": "A request for candidate piece and context endpoints",
+    "store.piece.tank-geometry": "The unique existing tank geometry piece",
+    "store.context.storage-domain": "One plausible storage context",
+    "store.context.storage-project": "A second plausible storage context",
+    "coverage.context-ambiguous": "The durable side reports that the context name is ambiguous",
+    "response.choose-context": "The caller receives both context candidates and no link result",
+    "durable.link.guessed-storage": "A path to a guessed storage context",
+    "durable.duplicate.tank-geometry": "A copied second version of the content"
+  },
+  "initial": {
+    "outside": ["request.organize-piece", "hint.tank-geometry-piece", "hint.context.storage"],
+    "layer": [],
+    "store": [],
+    "durable": ["store.piece.tank-geometry", "store.context.storage-domain", "store.context.storage-project"]
+  },
+  "steps": [
+    {
+      "id": "submit-organization-request",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send ordinary-language piece and context hints",
+      "requires": ["request.organize-piece", "hint.tank-geometry-piece", "hint.context.storage"],
+      "send": [{"to": "layer", "items": ["request.organize-piece", "hint.tank-geometry-piece", "hint.context.storage"]}]
+    },
+    {
+      "id": "request-endpoints",
+      "actor": "layer",
+      "mode": "lookup",
+      "note": "Ask for candidate piece and context endpoints",
+      "requires": ["request.organize-piece", "hint.tank-geometry-piece", "hint.context.storage"],
+      "derive": ["lookup.piece-and-context"],
+      "send": [{"to": "store", "items": ["lookup.piece-and-context", "hint.tank-geometry-piece", "hint.context.storage"]}]
+    },
+    {
+      "id": "return-ambiguous-context",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return the unique piece, both context candidates, and explicit ambiguity",
+      "requires": ["lookup.piece-and-context", "store.piece.tank-geometry", "store.context.storage-domain", "store.context.storage-project"],
+      "derive": ["coverage.context-ambiguous"],
+      "send": [{"to": "layer", "items": ["store.piece.tank-geometry", "store.context.storage-domain", "store.context.storage-project", "coverage.context-ambiguous"]}]
+    },
+    {
+      "id": "return-clarification",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Return both context candidates without creating a link or content copy",
+      "requires": ["store.piece.tank-geometry", "store.context.storage-domain", "store.context.storage-project", "coverage.context-ambiguous"],
+      "derive": ["response.choose-context"],
+      "send": [{"to": "outside", "items": ["response.choose-context"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.choose-context"]},
+    "not_has": {"durable": ["durable.link.guessed-storage", "durable.duplicate.tank-geometry"]},
+    "durable_added": [],
+    "durable_removed": [],
+    "response": "response.choose-context"
+  }
+}

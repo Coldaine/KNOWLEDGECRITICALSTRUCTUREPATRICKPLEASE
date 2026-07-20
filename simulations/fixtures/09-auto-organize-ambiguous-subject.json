@@ -1,0 +1,75 @@
+{
+  "id": "09-auto-organize-ambiguous-subject",
+  "title": "Expose ambiguous subjects before automatic organization",
+  "basis": ["T043-T048", "T055-T061", "T096-T098", "interaction-trace-9-pressure"],
+  "feasibility": "conditional",
+  "items": {
+    "request.record-observation": "The caller asks to record ordinary evidence",
+    "evidence.tank-geometry": "Source text mentions tank but is not bound to a unique host or pool",
+    "task.storage": "The outside task concerns storage",
+    "query.subjects-duplicates-contexts": "A request for subject, duplicate, and context candidates",
+    "store.entity.tank-a": "One pool named tank",
+    "store.entity.tank-b": "A second pool named tank",
+    "coverage.subject-ambiguous": "The returned evidence cannot select one tank",
+    "coverage.context-not-evaluated": "Context discovery stops because the primary subject is unresolved",
+    "response.choose-subject": "The caller receives both subjects, the missing distinction, and no accepted organization result",
+    "durable.observation.attached-by-guess": "The observation was attached to a guessed pool",
+    "durable.link.attached-by-guess": "A context path was attached to a guessed pool"
+  },
+  "initial": {
+    "outside": ["request.record-observation", "evidence.tank-geometry", "task.storage"],
+    "layer": [],
+    "store": [],
+    "durable": ["store.entity.tank-a", "store.entity.tank-b"]
+  },
+  "steps": [
+    {
+      "id": "submit-ordinary-evidence",
+      "actor": "outside",
+      "mode": "transfer",
+      "note": "Send evidence without a unique host or pool identity",
+      "requires": ["request.record-observation", "evidence.tank-geometry", "task.storage"],
+      "send": [{"to": "layer", "items": ["request.record-observation", "evidence.tank-geometry", "task.storage"]}]
+    },
+    {
+      "id": "request-candidates",
+      "actor": "layer",
+      "mode": "lookup",
+      "note": "Ask the durable side for subjects, possible duplicates, and candidate contexts",
+      "requires": ["request.record-observation", "evidence.tank-geometry", "task.storage"],
+      "derive": ["query.subjects-duplicates-contexts"],
+      "send": [{"to": "store", "items": ["query.subjects-duplicates-contexts", "evidence.tank-geometry", "task.storage"]}]
+    },
+    {
+      "id": "return-ambiguous-subjects",
+      "actor": "store",
+      "mode": "lookup",
+      "note": "Return both pools and state that context discovery was not safely evaluated",
+      "requires": [
+        "query.subjects-duplicates-contexts",
+        "evidence.tank-geometry",
+        "task.storage",
+        "store.entity.tank-a",
+        "store.entity.tank-b"
+      ],
+      "derive": ["coverage.subject-ambiguous", "coverage.context-not-evaluated"],
+      "send": [{"to": "layer", "items": ["store.entity.tank-a", "store.entity.tank-b", "coverage.subject-ambiguous", "coverage.context-not-evaluated"]}]
+    },
+    {
+      "id": "return-clarification",
+      "actor": "layer",
+      "mode": "response",
+      "note": "Return both candidates and stop before recording an interpretation or relationship",
+      "requires": ["store.entity.tank-a", "store.entity.tank-b", "coverage.subject-ambiguous", "coverage.context-not-evaluated"],
+      "derive": ["response.choose-subject"],
+      "send": [{"to": "outside", "items": ["response.choose-subject"]}]
+    }
+  ],
+  "expected": {
+    "has": {"outside": ["response.choose-subject"]},
+    "not_has": {"durable": ["durable.observation.attached-by-guess", "durable.link.attached-by-guess"]},
+    "durable_added": [],
+    "durable_removed": [],
+    "response": "response.choose-subject"
+  }
+}
