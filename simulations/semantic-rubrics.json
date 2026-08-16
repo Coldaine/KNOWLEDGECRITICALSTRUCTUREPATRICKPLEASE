@@ -1,0 +1,374 @@
+{
+  "version": 1,
+  "gate": {
+    "id": "T061",
+    "required_workflows": [
+      "01-observation",
+      "02-context",
+      "03-correction",
+      "04-conflict",
+      "05-retry",
+      "06-link",
+      "07-partial-effects",
+      "08-erase-safety",
+      "09-auto-organize"
+    ]
+  },
+  "workflows": {
+    "01-observation": {
+      "title": "Observation vs decision classification",
+      "pass_threshold": 1.0,
+      "cases": {
+        "01-observation-normal": {
+          "criteria": [
+            {
+              "id": "classify-observation-not-policy",
+              "mode": "semantic",
+              "must_produce": [
+                "meaning.arc-2g-observation",
+                "meaning.explicit-non-policy",
+                "proposal.retain-source",
+                "proposal.record-observation",
+                "proposal.preserve-qualification",
+                "proposal.qualify-old-reading"
+              ],
+              "allowed_produce": [
+                "meaning.arc-2g-observation",
+                "meaning.explicit-non-policy",
+                "proposal.retain-source",
+                "proposal.record-observation",
+                "proposal.preserve-qualification",
+                "proposal.qualify-old-reading"
+              ],
+              "must_not_produce": []
+            }
+          ]
+        },
+        "01-observation-missing-source": {
+          "criteria": [
+            {
+              "id": "recognize-source-gap",
+              "mode": "semantic",
+              "must_produce": [
+                "meaning.source-missing",
+                "proposal.current-observation"
+              ],
+              "allowed_produce": [
+                "meaning.source-missing",
+                "proposal.current-observation"
+              ],
+              "must_not_produce": []
+            }
+          ]
+        }
+      }
+    },
+    "02-context": {
+      "title": "Bounded context and coverage semantics",
+      "pass_threshold": 1.0,
+      "cases": {
+        "02-context-normal": {
+          "criteria": [
+            {
+              "id": "decompose-covered-context",
+              "mode": "semantic",
+              "must_produce": [
+                "query.task-categories"
+              ],
+              "allowed_produce": [
+                "query.task-categories"
+              ],
+              "must_not_produce": []
+            }
+          ]
+        },
+        "02-context-incomplete-coverage": {
+          "criteria": [
+            {
+              "id": "decompose-incomplete-context",
+              "mode": "semantic",
+              "must_produce": [
+                "query.task-categories"
+              ],
+              "allowed_produce": [
+                "query.task-categories"
+              ],
+              "must_not_produce": []
+            }
+          ]
+        }
+      }
+    },
+    "03-correction": {
+      "title": "Correction-target selection and history preservation",
+      "pass_threshold": 1.0,
+      "cases": {
+        "03-correction-normal": {
+          "criteria": [
+            {
+              "id": "qualify-exact-target",
+              "mode": "semantic",
+              "must_produce": [
+                "meaning.qualification",
+                "proposal.qualify-target"
+              ],
+              "allowed_produce": [
+                "meaning.qualification",
+                "proposal.qualify-target"
+              ],
+              "must_not_produce": []
+            }
+          ]
+        },
+        "03-correction-ambiguous-target": {
+          "criteria": [
+            {
+              "id": "do-not-guess-ambiguous-target",
+              "mode": "semantic",
+              "must_produce": [],
+              "allowed_produce": [],
+              "must_not_produce": []
+            }
+          ]
+        }
+      }
+    },
+    "04-conflict": {
+      "title": "Conflict preservation and unsupported-winner rejection",
+      "pass_threshold": 1.0,
+      "cases": {
+        "04-conflict-normal": {
+          "criteria": [
+            {
+              "id": "preserve-unresolved-conflict",
+              "mode": "semantic",
+              "must_produce": [
+                "meaning.unresolved-conflict",
+                "proposal.retain-new-source",
+                "proposal.record-competing-interpretation",
+                "proposal.record-conflict",
+                "proposal.record-resolution-question"
+              ],
+              "allowed_produce": [
+                "meaning.unresolved-conflict",
+                "proposal.retain-new-source",
+                "proposal.record-competing-interpretation",
+                "proposal.record-conflict",
+                "proposal.record-resolution-question"
+              ],
+              "must_not_produce": []
+            }
+          ]
+        },
+        "04-conflict-unsupported-winner": {
+          "criteria": [
+            {
+              "id": "reject-unsupported-winner",
+              "must_produce": [
+                "proposal.promote-new-winner",
+                "result.winner-rejected",
+                "response.conflict-remains"
+              ],
+              "must_not_produce": [
+                "durable.winner.disk-joined"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "05-retry": {
+      "title": "Retry outcome classification",
+      "pass_threshold": 1.0,
+      "cases": {
+        "05-retry-prior-outcome": {
+          "criteria": [
+            {
+              "id": "return-established-prior-result",
+              "must_produce": [
+                "status.prior-success-exact-match",
+                "response.prior-result"
+              ],
+              "must_not_produce": [
+                "durable.duplicate-effect"
+              ]
+            }
+          ]
+        },
+        "05-retry-indeterminate": {
+          "criteria": [
+            {
+              "id": "preserve-indeterminate-outcome",
+              "must_produce": [
+                "response.reconciliation-required"
+              ],
+              "must_not_produce": [
+                "durable.replayed-effect"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "06-link": {
+      "title": "Relationship-target resolution and reuse",
+      "pass_threshold": 1.0,
+      "cases": {
+        "06-link-normal": {
+          "criteria": [
+            {
+              "id": "reuse-one-piece-across-paths",
+              "mode": "semantic",
+              "must_produce": [
+                "meaning.same-piece-valid",
+                "proposal.link-storage",
+                "proposal.link-migration",
+                "proposal.link-inference"
+              ],
+              "allowed_produce": [
+                "meaning.same-piece-valid",
+                "proposal.link-storage",
+                "proposal.link-migration",
+                "proposal.link-inference"
+              ],
+              "must_not_produce": []
+            }
+          ]
+        },
+        "06-link-ambiguous-context": {
+          "criteria": [
+            {
+              "id": "do-not-guess-ambiguous-context",
+              "mode": "semantic",
+              "must_produce": [],
+              "allowed_produce": [],
+              "must_not_produce": []
+            }
+          ]
+        }
+      }
+    },
+    "07-partial-effects": {
+      "title": "Combined-effect and partial-outcome semantics",
+      "pass_threshold": 1.0,
+      "cases": {
+        "07-invalid-target-no-effects": {
+          "criteria": [
+            {
+              "id": "preview-combined-set",
+              "mode": "semantic",
+              "must_produce": [
+                "meaning.combined-effect-set",
+                "proposal.preview-effect-set"
+              ],
+              "allowed_produce": [
+                "meaning.combined-effect-set",
+                "proposal.preview-effect-set"
+              ],
+              "must_not_produce": []
+            }
+          ]
+        },
+        "07-interrupted-partial-outcome": {
+          "criteria": [
+            {
+              "id": "do-not-invent-semantic-resolution",
+              "mode": "semantic",
+              "must_produce": [],
+              "allowed_produce": [],
+              "must_not_produce": []
+            }
+          ]
+        }
+      }
+    },
+    "08-erase-safety": {
+      "title": "Stored-precondition evaluation without world action",
+      "pass_threshold": 1.0,
+      "cases": {
+        "08-erase-not-established": {
+          "criteria": [
+            {
+              "id": "identify-precondition-gap",
+              "mode": "semantic",
+              "must_produce": [
+                "query.resolve-disk-pool",
+                "meaning.precondition-gap"
+              ],
+              "allowed_produce": [
+                "query.resolve-disk-pool",
+                "meaning.precondition-gap"
+              ],
+              "must_not_produce": []
+            }
+          ]
+        },
+        "08-erase-supported-no-action": {
+          "criteria": [
+            {
+              "id": "recognize-supported-preconditions",
+              "mode": "semantic",
+              "must_produce": [
+                "query.resolve-and-evaluate",
+                "meaning.preconditions-supported"
+              ],
+              "allowed_produce": [
+                "query.resolve-and-evaluate",
+                "meaning.preconditions-supported"
+              ],
+              "must_not_produce": []
+            }
+          ]
+        }
+      }
+    },
+    "09-auto-organize": {
+      "title": "Automatic organization with provisional inferred links",
+      "pass_threshold": 1.0,
+      "cases": {
+        "09-auto-organize-normal": {
+          "criteria": [
+            {
+              "id": "separate-direct-from-inferred-organization",
+              "mode": "semantic",
+              "must_produce": [
+                "meaning.tank-geometry-observation",
+                "meaning.direct-versus-inferred-organization",
+                "proposal.retain-source",
+                "proposal.record-observation",
+                "proposal.link-n5",
+                "proposal.link-tank",
+                "proposal.link-storage",
+                "proposal.suggest-migration",
+                "proposal.suggest-inference"
+              ],
+              "allowed_produce": [
+                "meaning.tank-geometry-observation",
+                "meaning.direct-versus-inferred-organization",
+                "proposal.retain-source",
+                "proposal.record-observation",
+                "proposal.link-n5",
+                "proposal.link-tank",
+                "proposal.link-storage",
+                "proposal.suggest-migration",
+                "proposal.suggest-inference"
+              ],
+              "must_not_produce": []
+            }
+          ]
+        },
+        "09-auto-organize-ambiguous-subject": {
+          "criteria": [
+            {
+              "id": "do-not-organize-ambiguous-subject",
+              "mode": "semantic",
+              "must_produce": [],
+              "allowed_produce": [],
+              "must_not_produce": []
+            }
+          ]
+        }
+      }
+    }
+  }
+}
