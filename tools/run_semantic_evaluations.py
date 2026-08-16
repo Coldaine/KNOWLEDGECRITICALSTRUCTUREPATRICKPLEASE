@@ -10,7 +10,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from tools.run_simulations import TraceError, find_fixtures, replay
+if __package__:
+    from tools.run_simulations import TraceError, find_fixtures, replay
+else:
+    from run_simulations import TraceError, find_fixtures, replay
 
 DEFAULT_RUBRICS = Path("simulations") / "semantic-rubrics.json"
 DEFAULT_RESULTS = Path("simulations") / "results" / "latest.json"
